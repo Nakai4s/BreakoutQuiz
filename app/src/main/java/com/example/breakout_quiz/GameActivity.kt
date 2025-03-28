@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.WindowInsetsUtil
 
 class GameActivity : AppCompatActivity() {
+
+    private lateinit var gameView: GameView
+    private lateinit var countdownOverlay: CountdownOverlay
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
@@ -16,6 +20,7 @@ class GameActivity : AppCompatActivity() {
         val rootView = findViewById<View>(R.id.rootLayout) // ルートレイアウトのID
         WindowInsetsUtil.applySafePadding(rootView)
 
+        /*
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             val lp = window.attributes
             lp.layoutInDisplayCutoutMode =
@@ -26,6 +31,17 @@ class GameActivity : AppCompatActivity() {
             val intent = Intent(this, ResultActivity::class.java)
             startActivity(intent)
             finish()
+        }*/
+
+        gameView = findViewById(R.id.game_view)
+        countdownOverlay = findViewById(R.id.countdown_overlay)
+
+        startCountdown()
+    }
+
+    private fun startCountdown() {
+        countdownOverlay.startCountdown {
+            gameView.startGame() // カウント終了後にゲーム開始
         }
     }
 }

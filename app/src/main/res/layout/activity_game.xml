@@ -1,22 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rootLayout"
-    android:fitsSystemWindows="false"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ゲーム画面（仮）"
-        android:textSize="20sp"
-        android:layout_marginBottom="24dp" />
+    <com.example.breakout_quiz.GameView
+        android:id="@+id/game_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"/>
 
-    <Button
-        android:id="@+id/endGameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ゲーム終了（リザルトへ）" />
-</LinearLayout>
+    <com.example.breakout_quiz.CountdownOverlay
+        android:id="@+id/countdown_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>
