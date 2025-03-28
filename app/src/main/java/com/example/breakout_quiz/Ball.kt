@@ -6,6 +6,6 @@ data class Ball(
     var radius: Float = 16f,
     var dx: Float = 5f,
     var dy: Float = -5f,
-    var speedMultiplier: Float = 1.0f,
+    var speedMultiplier: Float = 1.5f,
     val accelerationRate: Float = 0.002f // 毎フレーム速度が増える量
 )

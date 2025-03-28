@@ -9,6 +9,29 @@
         android:layout_height="match_parent"
         android:background="@color/black"/>
 
+    <!-- 解答ボタン（右上） -->
+    <Button
+        android:id="@+id/answer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="解答"
+        android:layout_margin="16dp"
+        android:layout_gravity="top|end" />
+
+    <!-- 4択ボタン表示用レイアウト（最初は非表示） -->
+    <LinearLayout
+        android:id="@+id/choice_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="bottom"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <!-- 動的にボタンを追加 -->
+    </LinearLayout>
+
     <com.example.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"
         android:layout_width="match_parent"

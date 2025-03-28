@@ -44,6 +44,18 @@ class GameView @JvmOverloads constructor(
     private val blockPadding = 8f
     /* ブロック end */
 
+    // 仮の問題文（後でQuizManagerなどで動的に取得）
+    private var currentQuestion: String = "なにがかくれているかな？"
+
+    // テキスト描画用 Paint
+    private val questionPaint = Paint().apply {
+        color = Color.DKGRAY
+        textSize = 48f
+        isAntiAlias = true
+        textAlign = Paint.Align.CENTER
+    }
+
+
 
     private lateinit var ball: Ball
     private val frameRate: Long = 16 // 60FPS 相当
@@ -80,19 +92,26 @@ class GameView @JvmOverloads constructor(
         isGameRunning = false
     }
 
+    /** クイズ解答中かどうか */
+    var isInQuizMode: Boolean = false
+
     /**
      * ゲーム画面の描画を行う。
      */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (isGameRunning) {
+        if (isGameRunning  && !isInQuizMode) {
             updateBall()
             checkBlockCollision()
+
+            drawBackgroundQuestion(canvas)  // ← ブロックの下に描画される
             drawBlocks(canvas)
             drawBall(canvas)
             drawPaddle(canvas)
 
             handler.postDelayed({ invalidate() }, frameRate)
+        } else {
+            // クイズ中は画面更新しない（または選択肢のみ）
         }
     }
 
@@ -195,6 +214,17 @@ class GameView @JvmOverloads constructor(
             }
         }
     }
+
+    /**
+     * クイズの問題文を背景に描画します（ブロックより背面）。
+     */
+    private fun drawBackgroundQuestion(canvas: Canvas) {
+        val x = viewWidth / 2f
+        val y = viewHeight * 0.2f
+
+        canvas.drawText(currentQuestion, x, y, questionPaint)
+    }
+
 
 
 
