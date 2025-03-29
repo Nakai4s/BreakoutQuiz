@@ -10,6 +10,9 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
+/**
+ * ゲームの描画とロジックを担うカスタムView。
+ */
 class GameView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -20,66 +23,53 @@ class GameView @JvmOverloads constructor(
     }
 
     var gameEventListener: GameEventListener? = null
+    var isInQuizMode: Boolean = false
 
-    // パドル
-    private val paddlePaint = Paint().apply {
-        color = Color.WHITE
-        isAntiAlias = true
-    }
-
-    private var paddle = Paddle(
-        x = 0f,
-        y = 0f,
-        width = 300f
-    )
-
-    // ボール
-    private val ballPaint = Paint().apply {
-        color = Color.YELLOW
-        isAntiAlias = true
-    }
-
-    /* ブロック start */
-    private val blockPaint = Paint().apply {
+    // 描画に使用するPaint群
+    private val paddlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
+    private val ballPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.YELLOW }
+    private val blockPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.CYAN
         style = Paint.Style.FILL
     }
-    private val blocks = mutableListOf<Block>()
-    private val blockRows = 5
-    private val blockCols = 6
-    private val blockPadding = 8f
-    /* ブロック end */
-
-    // 仮の問題文（後でQuizManagerなどで動的に取得）
-
-    private var currentQuestion: String = "なにがかくれているかな？"
-
-    public fun setQuestion(string: String){
-        currentQuestion = string
-    }
-
-    // テキスト描画用 Paint
-    private val questionPaint = Paint().apply {
+    private val questionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.DKGRAY
         textSize = 48f
-        isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
 
+    // オブジェクトと状態
     private lateinit var ball: Ball
-    private val frameRate: Long = 16 // 60FPS 相当
-    private val handler = Handler(Looper.getMainLooper())
+    private var paddle = Paddle(x = 0f, y = 0f, width = 300f)
+    private val blocks = mutableListOf<Block>()
+    private var viewWidth = 0
+    private var viewHeight = 0
+    private var isGameRunning = false
+    private var lastUpdateTime = System.currentTimeMillis()
 
-    private fun initBall() {
-        ball = Ball(
-            x = viewWidth / 2f,
-            y = viewHeight * 0.5f
-        )
+    // ステージ設定
+    private var backgroundColor: Int = Color.BLACK
+    private var blockColor: Int = Color.CYAN
+    private var currentQuestion: String = "なにがかくれているかな？"
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val frameRate: Long = 16 // 約60FPS
+
+    fun setQuestion(string: String) {
+        currentQuestion = string
     }
 
-    /**
-     * ボールを初期位置に戻します。
-     */
+    fun setStageColors(backgroundHex: String, blockHex: String) {
+        backgroundColor = Color.parseColor(backgroundHex)
+        blockColor = Color.parseColor(blockHex)
+        invalidate()
+    }
+
+    fun startGame() {
+        isGameRunning = true
+        invalidate()
+    }
+
     fun resetBall() {
         ball.x = width / 2f
         ball.y = height * 0.5f
@@ -88,34 +78,11 @@ class GameView @JvmOverloads constructor(
         ball.speedMultiplier = 1.0f
     }
 
-
-    private var viewWidth = 0
-    private var viewHeight = 0
-
-    private var isGameRunning = false
-
-    fun startGame() {
-        isGameRunning = true
+    fun regenerateBlocks() {
+        generateBlocks()
         invalidate()
     }
 
-    private fun stopGame() {
-        isGameRunning = false
-    }
-
-    /**
-     * ステージごとの背景色とブロック色を設定する
-     */
-    fun setStageColors(backgroundHex: String, blockHex: String) {
-        backgroundColor = Color.parseColor(backgroundHex)
-        blockColor = Color.parseColor(blockHex)
-        invalidate()
-    }
-
-
-    /**
-     * レイアウトが変更されたときに実行する
-     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         viewWidth = w
@@ -123,122 +90,86 @@ class GameView @JvmOverloads constructor(
         paddle.x = w / 2f
         paddle.y = h * 0.9f
         initBall()
-        generateBlocksInternal()
+        generateBlocks()
     }
 
-    /** クイズ解答中かどうか */
-    var isInQuizMode: Boolean = false
-
-    /** クイズの問題の色 */
-    private var backgroundColor: Int = Color.BLACK
-    private var blockColor: Int = Color.CYAN
-    /**
-     * ゲーム画面の描画を行う。
-     */
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        canvas.drawColor(backgroundColor) // ← 背景色適用
+        canvas.drawColor(backgroundColor)
 
         if (isGameRunning) {
-            // クイズ中以外はゲームを更新する
-            if(!isInQuizMode){
-                updateBall()
-                checkBlockCollision()
-            }
-            drawBackgroundQuestion(canvas)  // ← ブロックの下に描画される
+            if (!isInQuizMode) updateGame()
+            drawBackgroundQuestion(canvas)
             drawBlocks(canvas)
             drawBall(canvas)
             drawPaddle(canvas)
-
             handler.postDelayed({ invalidate() }, frameRate)
-        } else {
-            // クイズ中は画面更新しない（または選択肢のみ）
         }
     }
 
-    private fun drawPaddle(canvas: Canvas) {
-        canvas.drawRect(
-            paddle.left(),
-            paddle.y,
-            paddle.right(),
-            paddle.y + paddle.height,
-            paddlePaint
-        )
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isGameRunning) return true
+        if (event.action == MotionEvent.ACTION_MOVE || event.action == MotionEvent.ACTION_DOWN) {
+            paddle.x = event.x.coerceIn(paddle.width / 2, viewWidth - paddle.width / 2)
+            invalidate()
+        }
+        return true
     }
 
-    private fun updateBall() {
-        // 速度に加速
+    private fun initBall() {
+        ball = Ball(x = viewWidth / 2f, y = viewHeight * 0.5f)
+    }
+
+    private fun updateGame() {
+        val now = System.currentTimeMillis()
+        val deltaMillis = now - lastUpdateTime
+        lastUpdateTime = now
+
+        updateBall(deltaMillis)
+        checkBlockCollision()
+    }
+
+    private fun updateBall(deltaMillis: Long) {
         ball.speedMultiplier += ball.accelerationRate
+        val deltaTimeSec = deltaMillis / 1000f
+        ball.x += ball.dx * deltaTimeSec * ball.speedMultiplier
+        ball.y += ball.dy * deltaTimeSec * ball.speedMultiplier
 
-        ball.x += ball.dx * ball.speedMultiplier
-        ball.y += ball.dy * ball.speedMultiplier
-
-        // 左右の壁で反射
+        // 壁反射
         if (ball.x - ball.radius < 0 || ball.x + ball.radius > viewWidth) {
             ball.dx = -ball.dx
             ball.x = ball.x.coerceIn(ball.radius, viewWidth - ball.radius)
         }
-
-        // 上端で反射
         if (ball.y - ball.radius < 0) {
             ball.dy = -ball.dy
             ball.y = ball.radius
         }
 
         // パドルと衝突
-        if (ball.y + ball.radius >= paddle.y &&
-            ball.x in paddle.left()..paddle.right()
-        ) {
-            ball.dy = -Math.abs(ball.dy) // 上向きに反射
-
-            // パドルの中心からの距離で角度調整
+        if (ball.y + ball.radius >= paddle.y && ball.x in paddle.left()..paddle.right()) {
+            ball.dy = -Math.abs(ball.dy)
             val offset = (ball.x - paddle.x) / (paddle.width / 2)
             ball.dx += offset * 2f
         }
 
-        // 画面下に落下 → リトライ or 終了（次ステップで実装）
+        // 落下チェック
         if (ball.y - ball.radius > viewHeight) {
             gameEventListener?.onBallMissed()
             stopGame()
         }
     }
 
+    private fun stopGame() {
+        isGameRunning = false
+    }
+
+    private fun drawPaddle(canvas: Canvas) {
+        canvas.drawRect(paddle.left(), paddle.y, paddle.right(), paddle.y + paddle.height, paddlePaint)
+    }
 
     private fun drawBall(canvas: Canvas) {
         canvas.drawCircle(ball.x, ball.y, ball.radius, ballPaint)
     }
 
-    /**
-     * ゲーム中のブロックをすべて再生成し、再描画を行います。
-     * クイズ正解時やリセット時に使用します。
-     */
-    public fun regenerateBlocks() {
-        generateBlocksInternal()
-        invalidate()
-    }
-
-    /**
-     * ブロックを画面上部に格子状に生成します。
-     */
-    private fun generateBlocksInternal() {
-        blocks.clear()
-        val blockWidth = (viewWidth - (blockCols + 1) * blockPadding) / blockCols
-        val blockHeight = viewHeight * 0.05f
-
-        for (row in 0 until blockRows) {
-            for (col in 0 until blockCols) {
-                val left = blockPadding + col * (blockWidth + blockPadding)
-                val top = blockPadding + row * (blockHeight + blockPadding)
-                val right = left + blockWidth
-                val bottom = top + blockHeight
-                blocks.add(Block(left, top, right, bottom))
-            }
-        }
-    }
-
-    /**
-     * 現在表示状態のブロックをすべて描画します。
-     */
     private fun drawBlocks(canvas: Canvas) {
         blockPaint.color = blockColor
         for (block in blocks) {
@@ -248,9 +179,12 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * ボールがブロックに当たったかを判定し、削除・反射処理を行います。
-     */
+    private fun drawBackgroundQuestion(canvas: Canvas) {
+        val x = viewWidth / 2f
+        val y = viewHeight * 0.2f
+        canvas.drawText(currentQuestion, x, y, questionPaint)
+    }
+
     private fun checkBlockCollision() {
         for (block in blocks) {
             if (block.isVisible &&
@@ -266,25 +200,22 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * クイズの問題文を背景に描画します（ブロックより背面）。
-     */
-    private fun drawBackgroundQuestion(canvas: Canvas) {
-        val x = viewWidth / 2f
-        val y = viewHeight * 0.2f
+    private fun generateBlocks() {
+        blocks.clear()
+        val blockRows = 5
+        val blockCols = 6
+        val blockPadding = 8f
+        val blockWidth = (viewWidth - (blockCols + 1) * blockPadding) / blockCols
+        val blockHeight = viewHeight * 0.05f
 
-        canvas.drawText(currentQuestion, x, y, questionPaint)
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!isGameRunning) return true
-
-        when (event.action) {
-            MotionEvent.ACTION_MOVE, MotionEvent.ACTION_DOWN -> {
-                paddle.x = event.x.coerceIn(paddle.width / 2, viewWidth - paddle.width / 2)
-                invalidate()
+        for (row in 0 until blockRows) {
+            for (col in 0 until blockCols) {
+                val left = blockPadding + col * (blockWidth + blockPadding)
+                val top = blockPadding + row * (blockHeight + blockPadding)
+                val right = left + blockWidth
+                val bottom = top + blockHeight
+                blocks.add(Block(left, top, right, bottom))
             }
         }
-        return true
     }
 }
