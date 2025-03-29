@@ -23,14 +23,27 @@
         android:id="@+id/choice_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_gravity="bottom"
+        android:background="#AA000000"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:padding="16dp"
         android:visibility="gone">
 
         <!-- 動的にボタンを追加 -->
     </LinearLayout>
+
+    <!-- 残り時間表示用の TextView（右上） -->
+    <TextView
+        android:id="@+id/timer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="60"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp" />
+
 
     <com.example.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"

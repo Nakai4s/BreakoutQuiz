@@ -15,6 +15,12 @@ class GameView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
+    interface GameEventListener {
+        fun onBallMissed()
+    }
+
+    var gameEventListener: GameEventListener? = null
+
     // パドル
     private val paddlePaint = Paint().apply {
         color = Color.WHITE
@@ -68,6 +74,18 @@ class GameView @JvmOverloads constructor(
         )
     }
 
+    /**
+     * ボールを初期位置に戻します。
+     */
+    fun resetBall() {
+        ball.x = width / 2f
+        ball.y = height * 0.5f
+        ball.dx = 5f
+        ball.dy = -5f
+        ball.speedMultiplier = 1.0f
+    }
+
+
     private var viewWidth = 0
     private var viewHeight = 0
 
@@ -85,7 +103,7 @@ class GameView @JvmOverloads constructor(
         paddle.x = w / 2f
         paddle.y = h * 0.9f
         initBall()
-        generateBlocks()
+        generateBlocksInternal()
     }
 
     private fun stopGame() {
@@ -110,8 +128,12 @@ class GameView @JvmOverloads constructor(
             drawPaddle(canvas)
 
             handler.postDelayed({ invalidate() }, frameRate)
-        } else {
+        } else if (isGameRunning){
             // クイズ中は画面更新しない（または選択肢のみ）
+            drawBackgroundQuestion(canvas)  // ← ブロックの下に描画される
+            drawBlocks(canvas)
+            drawBall(canvas)
+            drawPaddle(canvas)
         }
     }
 
@@ -157,8 +179,8 @@ class GameView @JvmOverloads constructor(
 
         // 画面下に落下 → リトライ or 終了（次ステップで実装）
         if (ball.y - ball.radius > viewHeight) {
+            gameEventListener?.onBallMissed()
             stopGame()
-            // TODO: リトライ回数チェック & リザルト画面へ
         }
     }
 
@@ -168,9 +190,18 @@ class GameView @JvmOverloads constructor(
     }
 
     /**
+     * ゲーム中のブロックをすべて再生成し、再描画を行います。
+     * クイズ正解時やリセット時に使用します。
+     */
+    public fun regenerateBlocks() {
+        generateBlocksInternal()
+        invalidate()
+    }
+
+    /**
      * ブロックを画面上部に格子状に生成します。
      */
-    private fun generateBlocks() {
+    private fun generateBlocksInternal() {
         blocks.clear()
         val blockWidth = (viewWidth - (blockCols + 1) * blockPadding) / blockCols
         val blockHeight = viewHeight * 0.05f

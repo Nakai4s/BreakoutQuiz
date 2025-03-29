@@ -6,9 +6,10 @@
     android:padding="24dp">
 
     <TextView
+        android:id="@+id/result_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ゲーム結果"
+        android:text="スコア：0問正解"
         android:textSize="20sp"
         android:layout_marginBottom="24dp" />
 
