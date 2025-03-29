@@ -1,44 +1,36 @@
 package com.example.breakout_quiz
 
+import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
 /**
  * クイズの現在の問題と進行状態を管理するクラス。
  */
 class QuizManager {
 
-    data class QuizQuestion(
-        val question: String,
-        val answer: List<String>,
-        val choices: List<List<String>>
-    )
-
-    private var currentIndex = 0
     private var currentStep = 0
     private var score = 0
 
-    // 仮の問題リスト（後でJSONから読み込み）
-    private val questions = listOf(
-        QuizQuestion(
-            question = "らいおん",
-            answer = listOf("ら", "い", "お", "ん"),
-            choices = listOf(
-                listOf("ら", "あ", "う", "え"),
-                listOf("い", "あ", "え", "お"),
-                listOf("お", "え", "い", "う"),
-                listOf("ん", "い", "あ", "え")
-            )
-        ),
-        QuizQuestion(
-            question = "すいか",
-            answer = listOf("す", "い", "か"),
-            choices = listOf(
-                listOf("す", "あ", "い", "う"),
-                listOf("い", "え", "お", "か"),
-                listOf("か", "き", "く", "け")
-            )
-        )
-    )
+    private var allQuestions: List<QuizQuestion> = emptyList()
+    private var shuffledQuestions: MutableList<QuizQuestion> = mutableListOf()
+    private var currentQuestionIndex = 0
 
-    fun getCurrentQuestion(): QuizQuestion = questions[currentIndex]
+    /**
+     * アセットからJSONファイルを読み込んで問題リストを初期化します。
+     */
+    fun loadQuestionsFromAssets(context: Context, fileName: String = "quiz_data.json") {
+        val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+        val listType = object : TypeToken<List<QuizQuestion>>() {}.type
+        allQuestions = Gson().fromJson(jsonString, listType)
+
+        shuffledQuestions = allQuestions.shuffled().toMutableList()
+        currentQuestionIndex = 0
+        currentStep = 0
+        score = 0
+    }
+
+    fun getCurrentQuestion(): QuizQuestion = shuffledQuestions[currentQuestionIndex]
     fun getCurrentStep(): Int = currentStep
     fun getScore(): Int = score
 
@@ -67,7 +59,14 @@ class QuizManager {
      * 次の問題へ進む
      */
     fun moveToNextQuestion() {
-        currentIndex = (currentIndex + 1) % questions.size
+        currentQuestionIndex = (currentQuestionIndex + 1) % shuffledQuestions.size
         currentStep = 0
+    }
+
+    /**
+    * 残り問題数が0になったか判定します（未使用の場合は削除可）
+    */
+    fun isAllQuestionsAnswered(): Boolean {
+        return currentQuestionIndex >= shuffledQuestions.size - 1
     }
 }

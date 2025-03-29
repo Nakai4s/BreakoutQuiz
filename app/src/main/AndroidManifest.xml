@@ -36,6 +36,10 @@
             android:resizeableActivity="true"
             android:exported="true" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/Theme.BreakoutQuiz"
+            android:exported="true" />
 
     </application>
 

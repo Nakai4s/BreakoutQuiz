@@ -27,5 +27,10 @@ class StartActivity : AppCompatActivity() {
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
         }
+
+        findViewById<Button>(R.id.debug_button).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
     }
 }

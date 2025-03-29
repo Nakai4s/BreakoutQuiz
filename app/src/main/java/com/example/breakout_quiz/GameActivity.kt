@@ -20,6 +20,9 @@ class GameActivity : AppCompatActivity() {
     private lateinit var countdownOverlay: CountdownOverlay
     private lateinit var answerButton: Button
     private lateinit var choiceLayout: LinearLayout
+    private lateinit var feedbackText: TextView
+
+    // クイズマネージャー
     private val quizManager = QuizManager()
 
     // リトライ可能数
@@ -41,6 +44,9 @@ class GameActivity : AppCompatActivity() {
         WindowInsetsUtil.applySafePadding(rootView)
 
         timerText = findViewById(R.id.timer_text)
+        feedbackText = findViewById(R.id.feedback_text)
+
+        quizManager.loadQuestionsFromAssets(this) // ← JSON読み込み
 
         /*
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -64,6 +70,9 @@ class GameActivity : AppCompatActivity() {
             enterQuizMode()
         }
 
+        // ゲーム更新前の初期値をセットする
+        init()
+
         startCountdown()
 
         gameView.gameEventListener = object : GameView.GameEventListener {
@@ -80,6 +89,14 @@ class GameActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * 初期化する
+     */
+    private fun init() {
+        var q = quizManager.getCurrentQuestion()
+        gameView.setQuestion(q.question)
     }
 
     private fun startCountdown() {
@@ -110,8 +127,6 @@ class GameActivity : AppCompatActivity() {
         super.onDestroy()
         gameTimer?.cancel()
     }
-
-
 
     /**
      * クイズ解答モードに切り替え、選択肢を表示する
@@ -153,21 +168,51 @@ class GameActivity : AppCompatActivity() {
                 showChoices(quizManager.getCurrentQuestion().choices[quizManager.getCurrentStep()])
             }
             true -> {
-                Toast.makeText(this, "正解！", Toast.LENGTH_SHORT).show()
+                showFeedback("正解！", true)
                 quizManager.moveToNextQuestion()
-                resetForNextQuestion()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    resetForNextQuestion()
+                }, 800)
             }
             false -> {
-                Toast.makeText(this, "不正解…", Toast.LENGTH_SHORT).show()
+                showFeedback("不正解", false)
                 quizManager.moveToNextQuestion()
-                //resetForNextQuestion()
-                exitQuizMode()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    exitQuizMode()
+                }, 800)
             }
         }
     }
 
+    /**
+     * 正解・不正解時のフィードバックを表示する
+     */
+    private fun showFeedback(message: String, isCorrect: Boolean) {
+        feedbackText.text = message
+        feedbackText.setTextColor(if (isCorrect) 0xFF00FF00.toInt() else 0xFFFF4444.toInt()) // 緑 or 赤
+        feedbackText.visibility = View.VISIBLE
+
+        feedbackText.alpha = 0f
+        feedbackText.animate()
+            .alpha(1f)
+            .setDuration(200)
+            .withEndAction {
+                feedbackText.animate()
+                    .alpha(0f)
+                    .setDuration(200)
+                    .setStartDelay(400)
+                    .start()
+            }
+            .start()
+    }
+
+
     private fun resetForNextQuestion() {
-        startTimer() // タイマー再開（残り時間で）
+        val q = quizManager.getCurrentQuestion()
+        gameView.setStageColors(q.backgroundColor, q.blockColor)
+        // 問題文をセットする
+        gameView.setQuestion(q.question)
+
         choiceLayout.visibility = View.GONE
         gameView.isInQuizMode = false
         answerButton.isEnabled = true
@@ -175,6 +220,7 @@ class GameActivity : AppCompatActivity() {
         // 新しい問題＆ブロック再生成
         gameView.regenerateBlocks() // GameView で public にする
         gameView.invalidate()
+        startTimer() // タイマー再開（残り時間で）
     }
 
 
@@ -182,11 +228,13 @@ class GameActivity : AppCompatActivity() {
      * クイズ解答モードを終了し、ゲームを再開する
      */
     private fun exitQuizMode() {
-        startTimer() // タイマー再開（残り時間で）
+
         choiceLayout.visibility = View.GONE
         gameView.isInQuizMode = false
         answerButton.isEnabled = true
+
         gameView.invalidate()
+        startTimer() // タイマー再開（残り時間で）
     }
 
     /**
@@ -198,5 +246,4 @@ class GameActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
 }

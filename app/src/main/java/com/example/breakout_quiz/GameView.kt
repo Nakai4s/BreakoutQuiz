@@ -51,7 +51,12 @@ class GameView @JvmOverloads constructor(
     /* ブロック end */
 
     // 仮の問題文（後でQuizManagerなどで動的に取得）
+
     private var currentQuestion: String = "なにがかくれているかな？"
+
+    public fun setQuestion(string: String){
+        currentQuestion = string
+    }
 
     // テキスト描画用 Paint
     private val questionPaint = Paint().apply {
@@ -60,8 +65,6 @@ class GameView @JvmOverloads constructor(
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
-
-
 
     private lateinit var ball: Ball
     private val frameRate: Long = 16 // 60FPS 相当
@@ -96,6 +99,23 @@ class GameView @JvmOverloads constructor(
         invalidate()
     }
 
+    private fun stopGame() {
+        isGameRunning = false
+    }
+
+    /**
+     * ステージごとの背景色とブロック色を設定する
+     */
+    fun setStageColors(backgroundHex: String, blockHex: String) {
+        backgroundColor = Color.parseColor(backgroundHex)
+        blockColor = Color.parseColor(blockHex)
+        invalidate()
+    }
+
+
+    /**
+     * レイアウトが変更されたときに実行する
+     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         viewWidth = w
@@ -106,34 +126,33 @@ class GameView @JvmOverloads constructor(
         generateBlocksInternal()
     }
 
-    private fun stopGame() {
-        isGameRunning = false
-    }
-
     /** クイズ解答中かどうか */
     var isInQuizMode: Boolean = false
 
+    /** クイズの問題の色 */
+    private var backgroundColor: Int = Color.BLACK
+    private var blockColor: Int = Color.CYAN
     /**
      * ゲーム画面の描画を行う。
      */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (isGameRunning  && !isInQuizMode) {
-            updateBall()
-            checkBlockCollision()
+        canvas.drawColor(backgroundColor) // ← 背景色適用
 
+        if (isGameRunning) {
+            // クイズ中以外はゲームを更新する
+            if(!isInQuizMode){
+                updateBall()
+                checkBlockCollision()
+            }
             drawBackgroundQuestion(canvas)  // ← ブロックの下に描画される
             drawBlocks(canvas)
             drawBall(canvas)
             drawPaddle(canvas)
 
             handler.postDelayed({ invalidate() }, frameRate)
-        } else if (isGameRunning){
+        } else {
             // クイズ中は画面更新しない（または選択肢のみ）
-            drawBackgroundQuestion(canvas)  // ← ブロックの下に描画される
-            drawBlocks(canvas)
-            drawBall(canvas)
-            drawPaddle(canvas)
         }
     }
 
@@ -221,6 +240,7 @@ class GameView @JvmOverloads constructor(
      * 現在表示状態のブロックをすべて描画します。
      */
     private fun drawBlocks(canvas: Canvas) {
+        blockPaint.color = blockColor
         for (block in blocks) {
             if (block.isVisible) {
                 canvas.drawRect(block.left, block.top, block.right, block.bottom, blockPaint)
@@ -255,9 +275,6 @@ class GameView @JvmOverloads constructor(
 
         canvas.drawText(currentQuestion, x, y, questionPaint)
     }
-
-
-
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isGameRunning) return true
