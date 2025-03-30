@@ -23,6 +23,7 @@ class CountdownOverlay @JvmOverloads constructor(
     }
 
     fun startCountdown(onFinish: () -> Unit) {
+        GameView.isCountdownActive = true
         this.visibility = VISIBLE
         countdownTime = 3
         updateCountdown(onFinish)
@@ -37,6 +38,7 @@ class CountdownOverlay @JvmOverloads constructor(
             }, 1000)
         } else {
             this.visibility = GONE
+            GameView.isCountdownActive = false
             onFinish()
         }
     }

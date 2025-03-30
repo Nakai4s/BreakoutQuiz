@@ -7,6 +7,6 @@ data class QuizQuestion(
     val question: String,
     val answer: List<String>,
     val choices: List<List<String>>,
-    val backgroundColor: String = "#000000", // default black
-    val blockColor: String = "#00FFFF"       // default cyan
+//    val backgroundColor: String = "#000000", // default black
+//    val blockColor: String = "#00FFFF"       // default cyan
 )

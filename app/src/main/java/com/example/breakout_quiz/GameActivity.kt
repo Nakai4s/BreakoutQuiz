@@ -136,8 +136,9 @@ class GameActivity : AppCompatActivity() {
     private fun startNewQuestion() {
         val question = quizManager.getCurrentQuestion()
         gameView.setQuestion(question.question)
-        gameView.setStageColors(question.backgroundColor, question.blockColor)
+        // gameView.setStageColors(question.backgroundColor, question.blockColor)
         gameView.regenerateBlocks()
+        gameView.resetBall()
         exitQuizMode()
     }
 

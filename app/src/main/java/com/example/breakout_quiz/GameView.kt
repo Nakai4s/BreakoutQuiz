@@ -39,18 +39,21 @@ class GameView @JvmOverloads constructor(
     }
 
     // オブジェクトと状態
-    private lateinit var ball: Ball
+    private var ball = Ball(x = 0f, y = 0f, speedMultiplier = 1f)
     private var paddle = Paddle(x = 0f, y = 0f, width = 300f)
     private val blocks = mutableListOf<Block>()
     private var viewWidth = 0
     private var viewHeight = 0
     private var isGameRunning = false
     private var lastUpdateTime = System.currentTimeMillis()
+    companion object{
+        var isCountdownActive: Boolean = false
+    }
 
     // ステージ設定
     private var backgroundColor: Int = Color.BLACK
     private var blockColor: Int = Color.CYAN
-    private var currentQuestion: String = "なにがかくれているかな？"
+    private var currentQuestion: String = "question..."
 
     private val handler = Handler(Looper.getMainLooper())
     private val frameRate: Long = 16 // 約60FPS
@@ -59,6 +62,9 @@ class GameView @JvmOverloads constructor(
         currentQuestion = string
     }
 
+    /**
+     * ステージごとに背景やブロックの色を変更する
+     */
     fun setStageColors(backgroundHex: String, blockHex: String) {
         backgroundColor = Color.parseColor(backgroundHex)
         blockColor = Color.parseColor(blockHex)
@@ -68,14 +74,6 @@ class GameView @JvmOverloads constructor(
     fun startGame() {
         isGameRunning = true
         invalidate()
-    }
-
-    fun resetBall() {
-        ball.x = width / 2f
-        ball.y = height * 0.5f
-        ball.dx = 5f
-        ball.dy = -5f
-        ball.speedMultiplier = 1.0f
     }
 
     fun regenerateBlocks() {
@@ -89,15 +87,21 @@ class GameView @JvmOverloads constructor(
         viewHeight = h
         paddle.x = w / 2f
         paddle.y = h * 0.9f
-        initBall()
+        // initBall()
         generateBlocks()
+        resetBall()
     }
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(backgroundColor)
 
         if (isGameRunning) {
-            if (!isInQuizMode) updateGame()
+            // 経過時間（デルタタイム）
+            val now = System.currentTimeMillis()
+            val deltaMillis = now - lastUpdateTime
+            lastUpdateTime = now
+
+            if (!isCountdownActive && !isInQuizMode) updateGame(deltaMillis)
             drawBackgroundQuestion(canvas)
             drawBlocks(canvas)
             drawBall(canvas)
@@ -116,14 +120,23 @@ class GameView @JvmOverloads constructor(
     }
 
     private fun initBall() {
-        ball = Ball(x = viewWidth / 2f, y = viewHeight * 0.5f)
+        //ball = Ball(x = viewWidth * 0.5f, y = viewHeight * 0.5f, )
+        ball.speedMultiplier = ball.initSpeed
     }
 
-    private fun updateGame() {
-        val now = System.currentTimeMillis()
-        val deltaMillis = now - lastUpdateTime
-        lastUpdateTime = now
+    fun resetBall() {
+        ball.x = viewWidth / 2f
+        ball.y = viewHeight * 0.8f
+        ball.dx = if (Math.random() < 0.5) -1f else 1f
+        ball.dy = -1f
+        ball.speedMultiplier = ball.initSpeed
+    }
 
+    /**
+     * 主にボールの更新処理を行う。
+     * @param deltaMillis デルタタイム
+     */
+    private fun updateGame(deltaMillis: Long) {
         updateBall(deltaMillis)
         checkBlockCollision()
     }

@@ -7,7 +7,20 @@
         android:id="@+id/game_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"/>
+        android:background="@color/black" />
+
+    <!-- 制限時間を画面上部に表示 -->
+    <TextView
+        android:id="@+id/timer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="#80000000"
+        android:padding="8dp"
+        android:text="残り：60秒"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
 
     <!-- 解答ボタン（右上） -->
     <Button
@@ -33,17 +46,6 @@
         <!-- 動的にボタンを追加 -->
     </LinearLayout>
 
-    <!-- 残り時間表示用の TextView（右上） -->
-    <TextView
-        android:id="@+id/timer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="60"
-        android:textSize="20sp"
-        android:textColor="@android:color/white"
-        android:layout_gravity="top|start"
-        android:layout_margin="16dp" />
-
     <!-- 正解／不正解のフィードバック表示用 TextView -->
     <TextView
         android:id="@+id/feedback_text"
@@ -61,5 +63,6 @@
     <com.example.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 </FrameLayout>
