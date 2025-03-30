@@ -14,13 +14,13 @@
         android:id="@+id/timer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="8dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
         android:background="#80000000"
         android:padding="8dp"
         android:text="残り：60秒"
         android:textColor="#FFFFFF"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <!-- 解答ボタン（右上） -->
     <Button

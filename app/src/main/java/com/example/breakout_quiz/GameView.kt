@@ -33,6 +33,11 @@ class GameView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
     private val questionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textSize = 48f
+        textAlign = Paint.Align.LEFT
+    }
+    private val hintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.DKGRAY
         textSize = 48f
         textAlign = Paint.Align.CENTER
@@ -54,12 +59,17 @@ class GameView @JvmOverloads constructor(
     private var backgroundColor: Int = Color.BLACK
     private var blockColor: Int = Color.CYAN
     private var currentQuestion: String = "question..."
+    private var currentHint: String = "hint..."
 
     private val handler = Handler(Looper.getMainLooper())
     private val frameRate: Long = 16 // 約60FPS
 
-    fun setQuestion(string: String) {
-        currentQuestion = string
+    // ブロック最上段の高さ
+    private var blockTopY: Float = 0f
+
+    fun setQuestion(question: String, hint: String) {
+        currentQuestion = question
+        currentHint = hint
     }
 
     /**
@@ -102,10 +112,11 @@ class GameView @JvmOverloads constructor(
             lastUpdateTime = now
 
             if (!isCountdownActive && !isInQuizMode) updateGame(deltaMillis)
-            drawBackgroundQuestion(canvas)
+            drawBackgroundHint(canvas)
             drawBlocks(canvas)
             drawBall(canvas)
             drawPaddle(canvas)
+            drawForegroundQuestion(canvas)
             handler.postDelayed({ invalidate() }, frameRate)
         }
     }
@@ -152,9 +163,9 @@ class GameView @JvmOverloads constructor(
             ball.dx = -ball.dx
             ball.x = ball.x.coerceIn(ball.radius, viewWidth - ball.radius)
         }
-        if (ball.y - ball.radius < 0) {
+        if (ball.y - ball.radius < blockTopY) {
             ball.dy = -ball.dy
-            ball.y = ball.radius
+            ball.y = blockTopY + ball.radius
         }
 
         // パドルと衝突
@@ -192,10 +203,16 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    private fun drawBackgroundQuestion(canvas: Canvas) {
-        val x = viewWidth / 2f
-        val y = viewHeight * 0.2f
+    private fun drawForegroundQuestion(canvas: Canvas) {
+        val x = viewWidth * 0.05f
+        val y = viewHeight * 0.1f
         canvas.drawText(currentQuestion, x, y, questionPaint)
+    }
+
+    private fun drawBackgroundHint(canvas: Canvas) {
+        val x = viewWidth / 2f
+        val y = viewHeight * 0.25f
+        canvas.drawText(currentHint, x, y, hintPaint)
     }
 
     private fun checkBlockCollision() {
@@ -224,10 +241,14 @@ class GameView @JvmOverloads constructor(
         for (row in 0 until blockRows) {
             for (col in 0 until blockCols) {
                 val left = blockPadding + col * (blockWidth + blockPadding)
-                val top = blockPadding + row * (blockHeight + blockPadding)
+                val top = blockPadding + row * (blockHeight + blockPadding)+ viewHeight * 0.12f
                 val right = left + blockWidth
                 val bottom = top + blockHeight
                 blocks.add(Block(left, top, right, bottom))
+
+                if (row == 0 && col == 0) {
+                    blockTopY = top // 最上段のtop位置を記録
+                }
             }
         }
     }
