@@ -58,8 +58,10 @@ class QuizManager {
     /**
      * 次の問題へ進む
      */
-    fun moveToNextQuestion() {
-        currentQuestionIndex = (currentQuestionIndex + 1) % shuffledQuestions.size
+    fun moveToNextQuestion(isCorrect: Boolean) {
+        if(isCorrect){
+            currentQuestionIndex = (currentQuestionIndex + 1) % shuffledQuestions.size
+        }
         currentStep = 0
     }
 

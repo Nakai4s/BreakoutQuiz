@@ -22,14 +22,7 @@
         android:textColor="#FFFFFF"
         android:textSize="20sp"/>
 
-    <!-- 解答ボタン（右上） -->
-    <Button
-        android:id="@+id/answer_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="解答"
-        android:layout_margin="16dp"
-        android:layout_gravity="top|end" />
+
 
     <!-- 4択ボタン表示用レイアウト（最初は非表示） -->
     <LinearLayout
@@ -59,6 +52,14 @@
         android:background="#88000000"
         android:padding="16dp" />
 
+    <!-- 解答ボタン（右上） -->
+    <Button
+        android:id="@+id/answer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="解答"
+        android:layout_margin="16dp"
+        android:layout_gravity="top|end" />
 
     <com.example.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"

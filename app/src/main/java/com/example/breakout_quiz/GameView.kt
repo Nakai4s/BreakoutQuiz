@@ -38,9 +38,9 @@ class GameView @JvmOverloads constructor(
         textAlign = Paint.Align.LEFT
     }
     private val hintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.DKGRAY
-        textSize = 48f
-        textAlign = Paint.Align.CENTER
+        color = Color.WHITE
+        textSize = 36f
+        textAlign = Paint.Align.LEFT
     }
 
     // オブジェクトと状態
@@ -144,7 +144,7 @@ class GameView @JvmOverloads constructor(
     }
 
     /**
-     * 主にボールの更新処理を行う。
+     * ボールとブロックの更新処理を行う。
      * @param deltaMillis デルタタイム
      */
     private fun updateGame(deltaMillis: Long) {
@@ -152,6 +152,10 @@ class GameView @JvmOverloads constructor(
         checkBlockCollision()
     }
 
+    /**
+     * ボールの更新処理を行う
+     * @param deltaMillis デルタタイム
+     */
     private fun updateBall(deltaMillis: Long) {
         ball.speedMultiplier += ball.accelerationRate
         val deltaTimeSec = deltaMillis / 1000f
@@ -210,9 +214,14 @@ class GameView @JvmOverloads constructor(
     }
 
     private fun drawBackgroundHint(canvas: Canvas) {
-        val x = viewWidth / 2f
-        val y = viewHeight * 0.25f
-        canvas.drawText(currentHint, x, y, hintPaint)
+        val x = viewWidth * 0.05f
+        val lines = currentHint.split("\n")
+        val baseY = viewHeight * 0.15f
+        // ブロックの高さを基準に計算
+        val lineSpacing = viewHeight * 0.05f//hintPaint.textSize * 1.8f
+        lines.forEachIndexed { index, line ->
+            canvas.drawText(line, x, baseY + index * lineSpacing, hintPaint)
+        }
     }
 
     private fun checkBlockCollision() {

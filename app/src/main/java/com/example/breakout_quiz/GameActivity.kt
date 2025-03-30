@@ -122,12 +122,12 @@ class GameActivity : AppCompatActivity() {
             null -> showChoices(quizManager.getCurrentQuestion().choices[quizManager.getCurrentStep()])
             true -> {
                 showFeedback("正解！", true)
-                quizManager.moveToNextQuestion()
+                quizManager.moveToNextQuestion(true)
                 Handler(Looper.getMainLooper()).postDelayed({ startNewQuestion() }, 800)
             }
             false -> {
                 showFeedback("不正解", false)
-                quizManager.moveToNextQuestion()
+                quizManager.moveToNextQuestion(false)
                 Handler(Looper.getMainLooper()).postDelayed({ exitQuizMode() }, 800)
             }
         }
