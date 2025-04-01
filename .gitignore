@@ -1,1 +1,9 @@
+# Android build files
+/build/
+/app/build/
+
+# Local configuration files
 local.properties
+
+# Quiz JSON files
+app/src/main/assets/*.json
