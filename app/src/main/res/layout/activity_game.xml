@@ -59,7 +59,8 @@
         android:layout_height="wrap_content"
         android:text="解答"
         android:layout_margin="16dp"
-        android:layout_gravity="top|end" />
+        android:layout_gravity="top|end"
+        android:visibility="gone"/>
 
     <com.example.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"

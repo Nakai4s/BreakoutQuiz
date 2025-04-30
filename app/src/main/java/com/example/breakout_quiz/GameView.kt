@@ -86,18 +86,12 @@ class GameView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun regenerateBlocks() {
-        generateBlocks()
-        invalidate()
-    }
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         viewWidth = w
         viewHeight = h
         paddle.x = w / 2f
         paddle.y = h * 0.9f
-        // initBall()
         generateBlocks()
         resetBall()
     }
@@ -130,14 +124,11 @@ class GameView @JvmOverloads constructor(
         return true
     }
 
-    private fun initBall() {
-        //ball = Ball(x = viewWidth * 0.5f, y = viewHeight * 0.5f, )
-        ball.speedMultiplier = ball.initSpeed
-    }
-
     fun resetBall() {
-        ball.x = viewWidth / 2f
-        ball.y = viewHeight * 0.8f
+        if (viewWidth > 0 && viewHeight > 0) {
+            ball.x = viewWidth / 2f
+            ball.y = viewHeight * 0.8f
+        }
         ball.dx = if (Math.random() < 0.5) -1f else 1f
         ball.dy = -1f
         ball.speedMultiplier = ball.initSpeed
@@ -149,7 +140,7 @@ class GameView @JvmOverloads constructor(
      */
     private fun updateGame(deltaMillis: Long) {
         updateBall(deltaMillis)
-        checkBlockCollision()
+        //checkBlockCollision()
     }
 
     /**
@@ -157,32 +148,57 @@ class GameView @JvmOverloads constructor(
      * @param deltaMillis デルタタイム
      */
     private fun updateBall(deltaMillis: Long) {
-        ball.speedMultiplier += ball.accelerationRate
-        val deltaTimeSec = deltaMillis / 1000f
-        ball.x += ball.dx * deltaTimeSec * ball.speedMultiplier
-        ball.y += ball.dy * deltaTimeSec * ball.speedMultiplier
+        // 移動量を計算（方向は実際に座標を変更する際に考慮する）
+        val totalMoveX = (deltaMillis / 1000f) * ball.speedMultiplier
+        val totalMoveY = (deltaMillis / 1000f) * ball.speedMultiplier
 
-        // 壁反射
-        if (ball.x - ball.radius < 0 || ball.x + ball.radius > viewWidth) {
-            ball.dx = -ball.dx
-            ball.x = ball.x.coerceIn(ball.radius, viewWidth - ball.radius)
-        }
-        if (ball.y - ball.radius < blockTopY) {
-            ball.dy = -ball.dy
-            ball.y = blockTopY + ball.radius
-        }
+        // ステップ数を動きが多い時ほど増やす（最大16分割などで十分）
+        val step = 8
+        val stepX = totalMoveX / step
+        val stepY = totalMoveY / step
 
-        // パドルと衝突
-        if (ball.y + ball.radius >= paddle.y && ball.x in paddle.left()..paddle.right()) {
-            ball.dy = -Math.abs(ball.dy)
-            val offset = (ball.x - paddle.x) / (paddle.width / 2)
-            ball.dx += offset * 2f
-        }
+        for (i in 1..step) {
+            ball.x += stepX * ball.dx
+            ball.y += stepY * ball.dy
 
-        // 落下チェック
-        if (ball.y - ball.radius > viewHeight) {
-            gameEventListener?.onBallMissed()
-            stopGame()
+            if (checkBlockCollision()) break // ← これで反応が漏れにくくなる
+
+            // 壁反射
+            if (ball.x - ball.radius < 0f) {
+                ball.x = ball.radius + 0.01f
+                ball.dx = -ball.dx
+                continue
+            }
+            if (ball.x + ball.radius > viewWidth) {
+                ball.x = viewWidth - ball.radius + 0.01f
+                ball.dx = -ball.dx
+                continue
+            }
+
+            // 上端反射（ブロックのtop）
+            if (ball.y - ball.radius < blockTopY) {
+                ball.y = blockTopY + ball.radius
+                ball.dy = -ball.dy
+                continue
+            }
+
+            // パドル判定
+            if (ball.y + ball.radius >= paddle.y && ball.y - ball.radius < paddle.y + paddle.height &&
+                ball.x in paddle.left()..paddle.right()
+            ) {
+                ball.y = paddle.y - ball.radius // パドル上面で止める
+                ball.dy = -Math.abs(ball.dy)
+//                val offset = (ball.x - paddle.x) / (paddle.width / 2)
+//                ball.dx += offset * 2f
+                continue
+            }
+
+            // 落下
+            if (ball.y - ball.radius > viewHeight) {
+                gameEventListener?.onBallMissed()
+                stopGame()
+                return
+            }
         }
     }
 
@@ -224,20 +240,43 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    private fun checkBlockCollision() {
+    /**
+     * ブロックとの衝突判定を行う。
+     */
+    private fun checkBlockCollision(): Boolean {
         for (block in blocks) {
-            if (block.isVisible &&
-                ball.x + ball.radius > block.left &&
-                ball.x - ball.radius < block.right &&
-                ball.y + ball.radius > block.top &&
-                ball.y - ball.radius < block.bottom
-            ) {
+            if (!block.isVisible) continue
+
+            // 衝突チェック（AABB）
+            val collision = ball.x + ball.radius > block.left &&
+                    ball.x - ball.radius < block.right &&
+                    ball.y + ball.radius > block.top &&
+                    ball.y - ball.radius < block.bottom
+
+            if (collision) {
                 block.isVisible = false
-                ball.dy = -ball.dy
-                break
+
+                // 反射方向を精密判定（既に導入済みと仮定）
+                val overlapLeft = ball.x + ball.radius - block.left
+                val overlapRight = block.right - (ball.x - ball.radius)
+                val overlapTop = ball.y + ball.radius - block.top
+                val overlapBottom = block.bottom - (ball.y - ball.radius)
+
+                val minOverlapX = minOf(overlapLeft, overlapRight)
+                val minOverlapY = minOf(overlapTop, overlapBottom)
+
+                if (minOverlapX < minOverlapY) {
+                    ball.dx = -ball.dx
+                } else {
+                    ball.dy = -ball.dy
+                }
+
+                return true // 衝突あり
             }
         }
+        return false // 衝突なし
     }
+
 
     private fun generateBlocks() {
         blocks.clear()

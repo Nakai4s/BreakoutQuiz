@@ -71,11 +71,19 @@ class GameActivity : AppCompatActivity() {
 
     private fun startCountdown() {
         countdownOverlay.startCountdown {
+            // カウントダウン終了時にボールを中央リセット
+            gameView.resetBall()
+
             remainingTimeMs = TOTAL_TIME_MS
             startTimer()
             startNewQuestion()
             gameView.startGame()
+
+            // カウントダウン終了後にボタンを表示
+            answerButton.visibility = View.VISIBLE
         }
+
+        //gameView.resetBall()
     }
 
     private fun startTimer() {
