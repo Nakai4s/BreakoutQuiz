@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TableRow
 
 /**
  * ゲームの描画とロジックを担うカスタムView。
@@ -92,7 +93,7 @@ class GameView @JvmOverloads constructor(
         viewHeight = h
         paddle.x = w / 2f
         paddle.y = h * 0.9f
-        generateBlocks()
+        generateBlocks(5, 6)
         resetBall()
     }
 
@@ -105,14 +106,16 @@ class GameView @JvmOverloads constructor(
             val deltaMillis = now - lastUpdateTime
             lastUpdateTime = now
 
+            // ゲーム動作中のみ更新処理を行う
             if (!isCountdownActive && !isInQuizMode) updateGame(deltaMillis)
-            drawBackgroundHint(canvas)
-            drawBlocks(canvas)
-            drawBall(canvas)
-            drawPaddle(canvas)
-            drawForegroundQuestion(canvas)
-            handler.postDelayed({ invalidate() }, frameRate)
         }
+        // 描画系は常に表示（カウントダウン中はUIが覆うので問題ない）
+        drawBackgroundHint(canvas)
+        drawBlocks(canvas)
+        drawBall(canvas)
+        drawPaddle(canvas)
+        drawForegroundQuestion(canvas)
+        handler.postDelayed({ invalidate() }, frameRate)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -188,8 +191,8 @@ class GameView @JvmOverloads constructor(
             ) {
                 ball.y = paddle.y - ball.radius // パドル上面で止める
                 ball.dy = -Math.abs(ball.dy)
-//                val offset = (ball.x - paddle.x) / (paddle.width / 2)
-//                ball.dx += offset * 2f
+                val offset = (ball.x - paddle.x) / (paddle.width / 2)
+                ball.dx += offset * 2f
                 continue
             }
 
@@ -202,7 +205,7 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    private fun stopGame() {
+    public fun stopGame() {
         isGameRunning = false
     }
 
@@ -278,11 +281,17 @@ class GameView @JvmOverloads constructor(
     }
 
 
-    private fun generateBlocks() {
+    /**
+     * ブロックを生成する
+     * @param row 行数
+     * @param column 列数
+     * @param padding パディング（デフォルトで8f）
+     */
+    private fun generateBlocks(row: Int, column: Int, padding: Float = 8f) {
         blocks.clear()
-        val blockRows = 5
-        val blockCols = 6
-        val blockPadding = 8f
+        val blockRows = row
+        val blockCols = column
+        val blockPadding = padding
         val blockWidth = (viewWidth - (blockCols + 1) * blockPadding) / blockCols
         val blockHeight = viewHeight * 0.05f
 

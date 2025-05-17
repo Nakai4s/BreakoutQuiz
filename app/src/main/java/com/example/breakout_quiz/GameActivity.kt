@@ -30,6 +30,9 @@ class GameActivity : AppCompatActivity() {
     private var remainingTimeMs = TOTAL_TIME_MS
     private var gameTimer: CountDownTimer? = null
 
+    /**
+     * ゲーム時間を設定
+     */
     companion object {
         private const val TOTAL_TIME_MS = 60_000L // 1分
     }
@@ -95,7 +98,11 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                goToResultScreen()
+                gameView.stopGame()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    goToResultScreen()
+                }, 2000)
+                //goToResultScreen()
             }
         }.start()
     }
@@ -176,6 +183,9 @@ class GameActivity : AppCompatActivity() {
             .start()
     }
 
+    /**
+     * リザルト画面へ遷移する
+     */
     private fun goToResultScreen() {
         val intent = Intent(this, ResultActivity::class.java)
         intent.putExtra("score", quizManager.getScore())

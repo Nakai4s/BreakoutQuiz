@@ -22,10 +22,17 @@ class CountdownOverlay @JvmOverloads constructor(
         countdownText = findViewById(R.id.countdown_text)
     }
 
+    /*
+    カウントダウンをリセットする
+     */
+    private fun resetCountdownTime() {
+        countdownTime = 3
+    }
+
     fun startCountdown(onFinish: () -> Unit) {
         GameView.isCountdownActive = true
         this.visibility = VISIBLE
-        countdownTime = 3
+        resetCountdownTime()
         updateCountdown(onFinish)
     }
 
