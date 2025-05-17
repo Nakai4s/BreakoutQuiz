@@ -9,20 +9,45 @@
         android:layout_height="match_parent"
         android:background="@color/black" />
 
-    <!-- 制限時間を画面上部に表示 -->
-    <TextView
-        android:id="@+id/timer_text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/statusLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_margin="16dp"
-        android:background="#80000000"
-        android:padding="8dp"
-        android:text="残り：60秒"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"/>
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="start"
+        android:layout_marginTop="8dp">
 
+        <TextView
+            android:id="@+id/timer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="残り：60秒"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/life_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/life_icon"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:paddingStart="8dp"/>
+    </LinearLayout>
+
+    <!-- 制限時間を画面上部に表示 -->
+<!--    <TextView-->
+<!--        android:id="@+id/timer_text"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="top|start"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:background="#80000000"-->
+<!--        android:padding="8dp"-->
+<!--        android:text="残り：60秒"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:textSize="20sp"/>-->
 
     <!-- 4択ボタン表示用レイアウト（最初は非表示） -->
     <LinearLayout

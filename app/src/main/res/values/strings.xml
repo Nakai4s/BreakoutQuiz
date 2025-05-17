@@ -3,4 +3,6 @@
 
     <!-- タイトル画面 -->
     <string name="start_label">ゲームスタート</string>
+    <!-- 残基アイコン -->
+    <string name="life_icon">　●●</string>
 </resources>

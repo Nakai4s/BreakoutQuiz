@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.WindowInsetsUtil
 
@@ -22,11 +21,14 @@ class GameActivity : AppCompatActivity() {
     private lateinit var countdownOverlay: CountdownOverlay
     private lateinit var answerButton: Button
     private lateinit var choiceLayout: LinearLayout
+
     private lateinit var timerText: TextView
+    private lateinit var lifeText: TextView
     private lateinit var feedbackText: TextView
 
     private val quizManager = QuizManager()
-    private var retryCount = 1
+    private var retryCount = 2
+
     private var remainingTimeMs = TOTAL_TIME_MS
     private var gameTimer: CountDownTimer? = null
 
@@ -48,6 +50,8 @@ class GameActivity : AppCompatActivity() {
         answerButton = findViewById(R.id.answer_button)
         choiceLayout = findViewById(R.id.choice_layout)
         timerText = findViewById(R.id.timer_text)
+        lifeText = findViewById(R.id.life_text)
+        updateLifeDisplay()
         feedbackText = findViewById(R.id.feedback_text)
 
         quizManager.loadQuestionsFromAssets(this)
@@ -57,19 +61,31 @@ class GameActivity : AppCompatActivity() {
         gameView.gameEventListener = object : GameView.GameEventListener {
             override fun onBallMissed() {
                 retryCount--
+                updateLifeDisplay()
                 if (retryCount >= 0) {
-                    Toast.makeText(this@GameActivity, "リトライ残り：$retryCount", Toast.LENGTH_SHORT).show()
                     Handler(Looper.getMainLooper()).postDelayed({
                         gameView.resetBall()
                         gameView.startGame()
                     }, 1000)
                 } else {
-                    goToResultScreen()
+                    gameView.stopGame()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        goToResultScreen()
+                    }, 2000)
                 }
             }
         }
 
         startCountdown()
+    }
+
+    /**
+     * 残基を更新する
+     */
+    private fun updateLifeDisplay() {
+        val lifeSymbol = "●"
+        val display = lifeSymbol.repeat(retryCount + 1)
+        lifeText.text = display
     }
 
     private fun startCountdown() {
@@ -102,7 +118,6 @@ class GameActivity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed({
                     goToResultScreen()
                 }, 2000)
-                //goToResultScreen()
             }
         }.start()
     }
