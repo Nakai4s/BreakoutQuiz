@@ -1,6 +1,9 @@
 package com.example.breakout_quiz
 
 import android.content.Intent
+import android.media.AudioManager
+import android.media.SoundPool
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -10,6 +13,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.breakout_quiz.utils.SoundManager
 import com.example.breakout_quiz.utils.WindowInsetsUtil
 
 /**
@@ -32,6 +36,9 @@ class GameActivity : AppCompatActivity() {
     private var remainingTimeMs = TOTAL_TIME_MS
     private var gameTimer: CountDownTimer? = null
 
+    private lateinit var soundPool: SoundPool
+    private var paddleHitSoundId: Int = 0
+
     /**
      * ゲーム時間を設定
      */
@@ -39,8 +46,20 @@ class GameActivity : AppCompatActivity() {
         private const val TOTAL_TIME_MS = 60_000L // 1分
     }
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        SoundManager.initialize(this)
+
+        // SoundPool 初期化
+        soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            SoundPool.Builder().setMaxStreams(5).build()
+        } else {
+            SoundPool(5, AudioManager.STREAM_MUSIC, 0)
+        }
+
+        paddleHitSoundId = soundPool.load(this, R.raw.se_paddle, 1)
         setContentView(R.layout.activity_game)
 
         WindowInsetsUtil.applySafePadding(findViewById(R.id.rootLayout))
@@ -74,9 +93,19 @@ class GameActivity : AppCompatActivity() {
                     }, 2000)
                 }
             }
+
+            override fun onPaddleHit() {
+                SoundManager.play("paddle")
+            }
         }
 
         startCountdown()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gameTimer?.cancel()
+        SoundManager.release()
     }
 
     /**
@@ -122,10 +151,7 @@ class GameActivity : AppCompatActivity() {
         }.start()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        gameTimer?.cancel()
-    }
+
 
     private fun enterQuizMode() {
         gameTimer?.cancel()

@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TableRow
+import com.example.breakout_quiz.utils.SoundManager
 
 /**
  * ゲームの描画とロジックを担うカスタムView。
@@ -21,6 +22,7 @@ class GameView @JvmOverloads constructor(
 
     interface GameEventListener {
         fun onBallMissed()
+        fun onPaddleHit()
     }
 
     var gameEventListener: GameEventListener? = null
@@ -193,6 +195,9 @@ class GameView @JvmOverloads constructor(
                 ball.dy = -Math.abs(ball.dy)
                 val offset = (ball.x - paddle.x) / (paddle.width / 2)
                 ball.dx += offset * 2f
+
+                gameEventListener?.onPaddleHit()
+                SoundManager.play("paddle")
                 continue
             }
 
