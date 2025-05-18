@@ -7,3 +7,6 @@ local.properties
 
 # Quiz JSON files
 app/src/main/assets/*.json
+
+# wav files
+app/src/main/res/raw/*.wav
