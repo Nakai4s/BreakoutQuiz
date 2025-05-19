@@ -4,19 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="#FF000000">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="@string/title"
+        android:textColor="@color/white"
+        android:textSize="48dp" />
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ゲームスタート" />
-
-    <Button
-        android:id="@+id/debug_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="セットアップ"
-        android:visibility="gone"/>
+        android:text="@string/start_label"/>
 
 </LinearLayout>

@@ -29,10 +29,8 @@ object SoundManager {
 
         // 効果音ファイルを res/raw に置き、ここで読み込む
         soundMap["paddle"] = soundPool.load(context, R.raw.se_paddle, 1)
-//        soundMap["block"] = soundPool.load(context, R.raw.se_block, 1)
-//        soundMap["miss"] = soundPool.load(context, R.raw.se_miss, 1)
-//        soundMap["answer_correct"] = soundPool.load(context, R.raw.se_correct, 1)
-//        soundMap["answer_wrong"] = soundPool.load(context, R.raw.se_wrong, 1)
+        soundMap["true"] = soundPool.load(context, R.raw.se_true, 1)
+        soundMap["false"] = soundPool.load(context, R.raw.se_false, 1)
 
         isInitialized = true
     }

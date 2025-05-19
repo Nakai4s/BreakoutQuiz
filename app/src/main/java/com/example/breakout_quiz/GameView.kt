@@ -210,7 +210,7 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    public fun stopGame() {
+    fun stopGame() {
         isGameRunning = false
     }
 
