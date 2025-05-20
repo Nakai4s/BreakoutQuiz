@@ -288,22 +288,19 @@ class GameView @JvmOverloads constructor(
 
     /**
      * ブロックを生成する
-     * @param row 行数
-     * @param column 列数
+     * @param rows 行数
+     * @param columns 列数
      * @param padding パディング（デフォルトで8f）
      */
-    private fun generateBlocks(row: Int, column: Int, padding: Float = 8f) {
+    fun generateBlocks(rows: Int, columns: Int, padding: Float = 8f) {
         blocks.clear()
-        val blockRows = row
-        val blockCols = column
-        val blockPadding = padding
-        val blockWidth = (viewWidth - (blockCols + 1) * blockPadding) / blockCols
+        val blockWidth = (viewWidth - (columns + 1) * padding) / columns
         val blockHeight = viewHeight * 0.05f
 
-        for (row in 0 until blockRows) {
-            for (col in 0 until blockCols) {
-                val left = blockPadding + col * (blockWidth + blockPadding)
-                val top = blockPadding + row * (blockHeight + blockPadding)+ viewHeight * 0.12f
+        for (row in 0 until rows) {
+            for (col in 0 until columns) {
+                val left = padding + col * (blockWidth + padding)
+                val top = padding + row * (blockHeight + padding)+ viewHeight * 0.12f
                 val right = left + blockWidth
                 val bottom = top + blockHeight
                 blocks.add(Block(left, top, right, bottom))

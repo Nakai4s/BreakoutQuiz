@@ -194,6 +194,7 @@ class GameActivity : AppCompatActivity() {
         gameView.setQuestion(question.question, question.hint)
         // gameView.setStageColors(question.backgroundColor, question.blockColor)
         // gameView.regenerateBlocks()
+        gameView.generateBlocks(5, 6)
         gameView.resetBall()
         exitQuizMode()
     }

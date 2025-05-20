@@ -28,9 +28,5 @@ class StartActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<Button>(R.id.debug_button).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
     }
 }
