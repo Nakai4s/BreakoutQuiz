@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.SoundManager
 import com.example.breakout_quiz.utils.WindowInsetsUtil
@@ -36,8 +37,9 @@ class GameActivity : AppCompatActivity() {
     private var remainingTimeMs = TOTAL_TIME_MS
     private var gameTimer: CountDownTimer? = null
 
-    private lateinit var soundPool: SoundPool
-    private var paddleHitSoundId: Int = 0
+    private var choiceTimeoutHandler = Handler(Looper.getMainLooper())
+    private var choiceTimeoutRunnable: Runnable? = null
+    private val CHOICE_TIMEOUT_MS = 5000L
 
     /**
      * ゲーム時間を設定
@@ -52,14 +54,6 @@ class GameActivity : AppCompatActivity() {
 
         SoundManager.initialize(this)
 
-        // SoundPool 初期化
-        soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            SoundPool.Builder().setMaxStreams(5).build()
-        } else {
-            SoundPool(5, AudioManager.STREAM_MUSIC, 0)
-        }
-
-        paddleHitSoundId = soundPool.load(this, R.raw.se_paddle, 1)
         setContentView(R.layout.activity_game)
 
         WindowInsetsUtil.applySafePadding(findViewById(R.id.rootLayout))
@@ -78,6 +72,9 @@ class GameActivity : AppCompatActivity() {
         answerButton.setOnClickListener { enterQuizMode() }
 
         gameView.gameEventListener = object : GameView.GameEventListener {
+            /**
+             * ボールが落下した場合
+             */
             override fun onBallMissed() {
                 retryCount--
                 updateLifeDisplay()
@@ -94,6 +91,9 @@ class GameActivity : AppCompatActivity() {
                 }
             }
 
+            /**
+             * パドルがボールに接触した場合
+             */
             override fun onPaddleHit() {
                 SoundManager.play("paddle")
             }
@@ -117,6 +117,9 @@ class GameActivity : AppCompatActivity() {
         lifeText.text = display
     }
 
+    /**
+     * カウントダウンを開始する
+     */
     private fun startCountdown() {
         countdownOverlay.startCountdown {
             // カウントダウン終了時にボールを中央リセット
@@ -130,8 +133,6 @@ class GameActivity : AppCompatActivity() {
             // カウントダウン終了後にボタンを表示
             answerButton.visibility = View.VISIBLE
         }
-
-        //gameView.resetBall()
     }
 
     private fun startTimer() {
@@ -151,8 +152,9 @@ class GameActivity : AppCompatActivity() {
         }.start()
     }
 
-
-
+    /**
+     * クイズ解答モードに入る
+     */
     private fun enterQuizMode() {
         gameTimer?.cancel()
         gameView.isInQuizMode = true
@@ -160,6 +162,8 @@ class GameActivity : AppCompatActivity() {
         answerButton.isEnabled = false
 
         showChoices(quizManager.getCurrentQuestion().choices[quizManager.getCurrentStep()])
+        // タイムアウトの計測を開始する
+        startChoiceTimeout()
     }
 
     private fun showChoices(choices: List<String>) {
@@ -174,14 +178,23 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun handleChoiceSelected(selected: String) {
+        // 一旦タイマー停止
+        choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) }
+
         when (val result = quizManager.submitAnswer(selected)) {
-            null -> showChoices(quizManager.getCurrentQuestion().choices[quizManager.getCurrentStep()])
+            null -> {
+                showChoices(quizManager.getCurrentQuestion().choices[quizManager.getCurrentStep()])
+                // 次の文字選択タイマー開始
+                startChoiceTimeout()
+            }
             true -> {
+                SoundManager.play("true")
                 showFeedback("正解！", true)
                 quizManager.moveToNextQuestion(true)
                 Handler(Looper.getMainLooper()).postDelayed({ startNewQuestion() }, 800)
             }
             false -> {
+                SoundManager.play("false")
                 showFeedback("不正解", false)
                 quizManager.moveToNextQuestion(false)
                 Handler(Looper.getMainLooper()).postDelayed({ exitQuizMode() }, 800)
@@ -193,7 +206,6 @@ class GameActivity : AppCompatActivity() {
         val question = quizManager.getCurrentQuestion()
         gameView.setQuestion(question.question, question.hint)
         // gameView.setStageColors(question.backgroundColor, question.blockColor)
-        // gameView.regenerateBlocks()
         gameView.generateBlocks(5, 6)
         gameView.resetBall()
         exitQuizMode()
@@ -201,12 +213,20 @@ class GameActivity : AppCompatActivity() {
 
     private fun exitQuizMode() {
         startTimer()
+
+        // タイムアウト監視用のタイマー停止
+        choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) }
         choiceLayout.visibility = View.GONE
         gameView.isInQuizMode = false
         answerButton.isEnabled = true
         gameView.invalidate()
     }
 
+    /**
+     * 解答の正否を表示する
+     * @param message 表示する文字列
+     * @param isCorrect 正解・不正解
+     */
     private fun showFeedback(message: String, isCorrect: Boolean) {
         feedbackText.text = message
         feedbackText.setTextColor(if (isCorrect) 0xFF00FF00.toInt() else 0xFFFF4444.toInt())
@@ -224,6 +244,21 @@ class GameActivity : AppCompatActivity() {
             }
             .start()
     }
+
+    /**
+     * タイムアウトを監視する
+     */
+    private fun startChoiceTimeout() {
+        choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) } // 既存タイマー停止
+
+        choiceTimeoutRunnable = Runnable {
+            Toast.makeText(this, "時間切れ！", Toast.LENGTH_SHORT).show()
+            quizManager.moveToNextQuestion(false)
+            exitQuizMode()
+        }
+        choiceTimeoutHandler.postDelayed(choiceTimeoutRunnable!!, CHOICE_TIMEOUT_MS)
+    }
+
 
     /**
      * リザルト画面へ遷移する
