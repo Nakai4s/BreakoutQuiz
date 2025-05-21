@@ -177,7 +177,25 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 選択肢を連続で押下するのを防止する
+     */
+    private fun disableAllChoiceButtons() {
+        for (i in 0 until choiceLayout.childCount) {
+            val child = choiceLayout.getChildAt(i)
+            if (child is Button) {
+                child.isEnabled = false
+            }
+        }
+    }
+
+    /**
+     * 選択肢を押下した際の挙動を制御する
+     */
     private fun handleChoiceSelected(selected: String) {
+        // すべての選択肢を選択不可にする
+        disableAllChoiceButtons()
+
         // 一旦タイマー停止
         choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) }
 
@@ -252,9 +270,10 @@ class GameActivity : AppCompatActivity() {
         choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) } // 既存タイマー停止
 
         choiceTimeoutRunnable = Runnable {
-            Toast.makeText(this, "時間切れ！", Toast.LENGTH_SHORT).show()
+            SoundManager.play("false")
+            showFeedback("不正解", false)
             quizManager.moveToNextQuestion(false)
-            exitQuizMode()
+            Handler(Looper.getMainLooper()).postDelayed({ exitQuizMode() }, 800)
         }
         choiceTimeoutHandler.postDelayed(choiceTimeoutRunnable!!, CHOICE_TIMEOUT_MS)
     }
