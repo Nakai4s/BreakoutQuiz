@@ -1,9 +1,6 @@
 package com.example.breakout_quiz
 
 import android.content.Intent
-import android.media.AudioManager
-import android.media.SoundPool
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -12,7 +9,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.SoundManager
 import com.example.breakout_quiz.utils.WindowInsetsUtil
@@ -41,11 +37,14 @@ class GameActivity : AppCompatActivity() {
     private var choiceTimeoutRunnable: Runnable? = null
     private val CHOICE_TIMEOUT_MS = 5000L
 
+    // クイズジャンル（リザルト画面に引き継ぐ）
+    private lateinit var genre: String
+
     /**
      * ゲーム時間を設定
      */
     companion object {
-        private const val TOTAL_TIME_MS = 60_000L // 1分
+        private const val TOTAL_TIME_MS = 15_000L // 1分
     }
 
     @Suppress("DEPRECATION")
@@ -67,7 +66,10 @@ class GameActivity : AppCompatActivity() {
         updateLifeDisplay()
         feedbackText = findViewById(R.id.feedback_text)
 
-        quizManager.loadQuestionsFromAssets(this)
+        // ジャンルごとのクイズデータを設定
+        genre = intent.getStringExtra("genre") ?: "default"
+        val filename = "quizdata_${genre}.json"
+        quizManager.loadQuestionsFromAssets(this, filename)
 
         answerButton.setOnClickListener { enterQuizMode() }
 
@@ -285,6 +287,7 @@ class GameActivity : AppCompatActivity() {
     private fun goToResultScreen() {
         val intent = Intent(this, ResultActivity::class.java)
         intent.putExtra("score", quizManager.getScore())
+        intent.putExtra("genre", genre)
         startActivity(intent)
         finish()
     }

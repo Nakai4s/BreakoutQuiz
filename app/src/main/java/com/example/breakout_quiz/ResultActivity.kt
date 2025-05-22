@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.breakout_quiz.utils.WindowInsetsUtil
 
 class ResultActivity : AppCompatActivity() {
 
@@ -13,8 +14,11 @@ class ResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
 
+        WindowInsetsUtil.applySafePadding(findViewById(R.id.rootLayout))
+
         val score = intent.getIntExtra("score", 0)
         val time = intent.getLongExtra("elapsed_time", 0)
+        val genre = intent.getStringExtra("genre")
 
         ScoreManager.saveScore(this, score, time)
 
@@ -24,7 +28,9 @@ class ResultActivity : AppCompatActivity() {
         displayRanking()
 
         findViewById<Button>(R.id.retryButton).setOnClickListener {
-            startActivity(Intent(this, GameActivity::class.java))
+            val intent = Intent(this, GameActivity::class.java)
+            intent.putExtra("genre", genre)
+            startActivity(intent)
             finish()
         }
 

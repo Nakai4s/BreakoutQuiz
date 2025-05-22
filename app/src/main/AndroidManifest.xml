@@ -25,6 +25,12 @@
         </activity>
 
         <activity
+            android:name=".GenreSelectActivity"
+            android:theme="@style/Theme.BreakoutQuiz"
+            android:resizeableActivity="true"
+            android:exported="true" />
+
+        <activity
             android:name=".GameActivity"
             android:theme="@style/Theme.BreakoutQuiz"
             android:resizeableActivity="true"
