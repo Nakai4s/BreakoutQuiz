@@ -1,15 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:layout_margin="8dp"
+    android:layout_margin="18dp"
     android:gravity="center"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/genre_name"
-        android:textSize="18sp"
-        android:textColor="#333"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="スポーツ" />
+        android:layout_width="160dp"
+        android:layout_height="62dp"
+        android:background="@drawable/genre_item_bg"
+        android:text="スポーツ"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
 </LinearLayout>

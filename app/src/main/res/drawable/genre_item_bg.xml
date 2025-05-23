@@ -1,0 +1,14 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- 背景色（ポップなパステル） -->
+    <solid android:color="@color/gray" />
+
+    <!-- 枠線 -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/white" />
+
+    <!-- 角丸 -->
+    <corners android:radius="6dp" />
+</shape>

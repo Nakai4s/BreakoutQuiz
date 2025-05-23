@@ -12,6 +12,7 @@ import com.example.breakout_quiz.utils.WindowInsetsUtil
  */
 class GenreSelectActivity : AppCompatActivity() {
 
+    // jsonファイル名と同じにする
     private val genreList = listOf("スポーツ", "歴史")
 
     override fun onCreate(savedInstanceState: Bundle?) {

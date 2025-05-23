@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/black"
     android:padding="24dp">
 
     <TextView
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:text="スコア：0問正解"
         android:textSize="20sp"
+        android:textColor="@color/white"
         android:layout_marginBottom="24dp" />
 
     <TextView
@@ -35,12 +37,12 @@
         android:id="@+id/retryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="もう一度プレイ" />
+        android:text="@string/retry" />
 
     <Button
         android:id="@+id/titleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="タイトルに戻る"
+        android:text="@string/to_title"
         android:layout_marginTop="16dp" />
 </LinearLayout>

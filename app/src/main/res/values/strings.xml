@@ -6,4 +6,8 @@
     <string name="start_label">ゲームスタート</string>
     <!-- 残基アイコン -->
     <string name="life_icon">　●●</string>
+    <!-- リザルト画面 -->
+    <string name="retry">リトライ</string>
+    <string name="to_title">タイトルへ戻る</string>
+
 </resources>
