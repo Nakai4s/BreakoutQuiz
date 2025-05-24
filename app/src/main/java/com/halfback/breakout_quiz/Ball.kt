@@ -6,9 +6,10 @@ data class Ball(
 
     // 半径
     val radius: Float = 16f,
+    // x方向(-1 <= x <= 1)
     var dx: Float = 1f,
+    // y方向(-1 <= y <= 1)
     var dy: Float = -1f,
-    val initSpeed: Float = 500.0f,
-    var speedMultiplier: Float,
-    val accelerationRate: Float = 1f // 毎フレーム速度が増える量
+    // 速度
+    val speedMultiplier: Float = 500.0f,
 )

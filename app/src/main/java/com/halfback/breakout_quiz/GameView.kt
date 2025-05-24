@@ -46,7 +46,7 @@ class GameView @JvmOverloads constructor(
     }
 
     // オブジェクトと状態
-    private var ball = Ball(x = 0f, y = 0f, speedMultiplier = 1f)
+    private var ball = Ball(x = 0f, y = 0f)
     private var paddle = Paddle(x = 0f, y = 0f, width = 300f)
     private val blocks = mutableListOf<Block>()
     private var viewWidth = 0
@@ -73,15 +73,6 @@ class GameView @JvmOverloads constructor(
     fun setQuestion(question: String, hint: String) {
         currentQuestion = "Q:$question"
         currentHint = hint
-    }
-
-    /**
-     * ステージごとに背景やブロックの色を変更する
-     */
-    fun setStageColors(backgroundHex: String, blockHex: String) {
-        backgroundColor = Color.parseColor(backgroundHex)
-        blockColor = Color.parseColor(blockHex)
-        invalidate()
     }
 
     fun startGame() {
@@ -130,6 +121,9 @@ class GameView @JvmOverloads constructor(
         return true
     }
 
+    /**
+     * ボールの位置を初期化する
+     */
     fun resetBall() {
         if (viewWidth > 0 && viewHeight > 0) {
             ball.x = viewWidth / 2f
@@ -137,7 +131,6 @@ class GameView @JvmOverloads constructor(
         }
         ball.dx = if (Math.random() < 0.5) -1f else 1f
         ball.dy = -1f
-        ball.speedMultiplier = ball.initSpeed
     }
 
     /**
@@ -145,15 +138,6 @@ class GameView @JvmOverloads constructor(
      * @param deltaMillis デルタタイム
      */
     private fun updateGame(deltaMillis: Long) {
-        updateBall(deltaMillis)
-        //checkBlockCollision()
-    }
-
-    /**
-     * ボールの更新処理を行う
-     * @param deltaMillis デルタタイム
-     */
-    private fun updateBall(deltaMillis: Long) {
         // 移動量を計算（方向は実際に座標を変更する際に考慮する）
         val totalMoveX = (deltaMillis / 1000f) * ball.speedMultiplier
         val totalMoveY = (deltaMillis / 1000f) * ball.speedMultiplier

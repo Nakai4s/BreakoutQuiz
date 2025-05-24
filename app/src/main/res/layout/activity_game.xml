@@ -56,34 +56,21 @@
             android:progressTint="#66BB6A"/>
     </LinearLayout>
 
-
-
-    <!-- 選択肢プログレスバー -->
-<!--    <ProgressBar-->
-<!--        android:id="@+id/choice_timer_bar"-->
-<!--        style="?android:attr/progressBarStyleHorizontal"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="6dp"-->
-<!--        android:max="5000"-->
-<!--        android:progress="5000"-->
-<!--        android:progressTint="#FF7043"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:layout_marginBottom="12dp"/>-->
-
     <!-- 選択肢 -->
     <LinearLayout
         android:id="@+id/choice_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#88FFFFFF"
+        android:background="#22888888"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="12dp"
         android:layout_marginTop="120dp"
-        android:visibility="gone">
+        android:visibility="visible">
         <!-- 動的にボタンを追加 -->
     </LinearLayout>
+
     <!-- 正解／不正解のフィードバック表示用 TextView -->
     <TextView
         android:id="@+id/feedback_text"

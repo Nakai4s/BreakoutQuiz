@@ -2,6 +2,7 @@ package com.halfback.breakout_quiz
 
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -233,7 +234,6 @@ class GameActivity : AppCompatActivity() {
     private fun startNewQuestion() {
         val question = quizManager.getCurrentQuestion()
         gameView.setQuestion(question.question, question.hint)
-        // gameView.setStageColors(question.backgroundColor, question.blockColor)
         gameView.generateBlocks(5, 6)
         gameView.resetBall()
         exitQuizMode()
@@ -244,6 +244,7 @@ class GameActivity : AppCompatActivity() {
 
         // タイムアウト監視用のタイマー停止
         choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) }
+
         choiceLayout.visibility = View.GONE
         gameView.isInQuizMode = false
         answerButton.isEnabled = true
@@ -288,20 +289,6 @@ class GameActivity : AppCompatActivity() {
         }
         choiceTimeoutHandler.postDelayed(choiceTimeoutRunnable!!, choiceTimeoutMs)
     }
-
-
-    /**
-     * プログレスバーのアニメーションを調整する
-     * @param bar プログレスバーのオブジェクト
-     * @param to
-     * @param duration
-     */
-    fun animateProgressBar(bar: ProgressBar, to: Int, duration: Long = 1000) {
-        var animation = ObjectAnimator.ofInt(bar, "progress", bar.progress)
-        animation.duration = duration
-        bar.setProgress(bar.progress, true)
-    }
-
 
     /**
      * リザルト画面へ遷移する
