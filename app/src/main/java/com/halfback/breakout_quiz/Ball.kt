@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 data class Ball(
     var x: Float,

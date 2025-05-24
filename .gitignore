@@ -5,6 +5,9 @@
 # Local configuration files
 local.properties
 
+# jks files
+my-release-key.jks
+
 # Quiz JSON files
 app/src/main/assets/*.json
 

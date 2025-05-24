@@ -1,11 +1,11 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.breakout_quiz.utils.WindowInsetsUtil
+import com.halfback.breakout_quiz.utils.WindowInsetsUtil
 
 /**
  * クイズジャンル選択画面のアクティビティ

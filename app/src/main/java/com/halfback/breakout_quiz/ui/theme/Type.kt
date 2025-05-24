@@ -1,4 +1,4 @@
-package com.example.breakout_quiz.ui.theme
+package com.halfback.breakout_quiz.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,3 +1,5 @@
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.breakout_quiz"
+    namespace = "com.halfback.breakout_quiz"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.breakout_quiz"
+        applicationId = "com.halfback.breakout_quiz"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -19,14 +21,28 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../my-release-key.jks")
+            storePassword = "7!@V#neR87"
+            keyAlias = "my-key-alias"
+            keyPassword = "7!@V#neR87"
+        }
+    }
+
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

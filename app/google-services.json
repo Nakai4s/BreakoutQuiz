@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:601377433114:android:fb29983b03451dc71213a3",
         "android_client_info": {
-          "package_name": "com.example.breakout_quiz"
+          "package_name": "com.halfback.breakout_quiz"
         }
       },
       "oauth_client": [],

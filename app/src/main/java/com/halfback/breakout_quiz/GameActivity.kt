@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 import android.animation.ObjectAnimator
 import android.content.Intent
@@ -12,9 +12,8 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.breakout_quiz.utils.SoundManager
-import com.example.breakout_quiz.utils.WindowInsetsUtil
-import org.w3c.dom.Text
+import com.halfback.breakout_quiz.utils.SoundManager
+import com.halfback.breakout_quiz.utils.WindowInsetsUtil
 
 /**
  * ゲーム画面のアクティビティ。ブロック崩しとクイズを同時に制御します。

@@ -1,10 +1,10 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.breakout_quiz.utils.WindowInsetsUtil
+import com.halfback.breakout_quiz.utils.WindowInsetsUtil
 
 class StartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

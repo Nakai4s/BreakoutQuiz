@@ -1,9 +1,9 @@
-package com.example.breakout_quiz.utils
+package com.halfback.breakout_quiz.utils
 
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
-import com.example.breakout_quiz.R
+import com.halfback.breakout_quiz.R
 
 /**
  * BGM・SEを管理する

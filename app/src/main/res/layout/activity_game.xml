@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <!-- ゲーム背景 -->
-    <com.example.breakout_quiz.GameView
+    <com.halfback.breakout_quiz.GameView
         android:id="@+id/game_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -108,7 +108,7 @@
         android:layout_gravity="center|bottom"
         android:visibility="gone"/>
     <!-- カウントダウン -->
-    <com.example.breakout_quiz.CountdownOverlay
+    <com.halfback.breakout_quiz.CountdownOverlay
         android:id="@+id/countdown_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

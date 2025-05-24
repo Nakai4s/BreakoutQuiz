@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 import org.junit.Test
 

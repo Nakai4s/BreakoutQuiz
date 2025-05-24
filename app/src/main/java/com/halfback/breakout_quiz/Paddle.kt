@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 data class Paddle(
     var x: Float,             // 中心X座標

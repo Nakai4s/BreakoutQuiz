@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 /**
  * クイズの1問分のデータを表すクラス。

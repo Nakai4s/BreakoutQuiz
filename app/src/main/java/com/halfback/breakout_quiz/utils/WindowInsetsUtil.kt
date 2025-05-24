@@ -1,4 +1,4 @@
-package com.example.breakout_quiz.utils
+package com.halfback.breakout_quiz.utils
 
 import android.view.View
 import androidx.core.view.ViewCompat

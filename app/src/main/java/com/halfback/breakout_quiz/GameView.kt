@@ -1,4 +1,4 @@
-package com.example.breakout_quiz
+package com.halfback.breakout_quiz
 
 import android.content.Context
 import android.graphics.Canvas
@@ -9,8 +9,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.TableRow
-import com.example.breakout_quiz.utils.SoundManager
+import com.halfback.breakout_quiz.utils.SoundManager
 
 /**
  * ゲームの描画とロジックを担うカスタムView。
