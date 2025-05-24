@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.SoundManager
 import com.example.breakout_quiz.utils.WindowInsetsUtil
+import org.w3c.dom.Text
 
 /**
  * ゲーム画面のアクティビティ。ブロック崩しとクイズを同時に制御します。
@@ -27,6 +28,7 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var lifeText: TextView
     private lateinit var feedbackText: TextView
+    private lateinit var trueCount: TextView
 
     private val quizManager = QuizManager()
     private var retryCount = 2
@@ -48,7 +50,7 @@ class GameActivity : AppCompatActivity() {
      * ゲーム時間を設定
      */
     companion object {
-        private const val TOTAL_TIME_MS = 15_000L // 1分
+        private const val TOTAL_TIME_MS = 60_000L // 1分
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,8 +70,8 @@ class GameActivity : AppCompatActivity() {
         lifeText = findViewById(R.id.life_text)
         updateLifeDisplay()
         feedbackText = findViewById(R.id.feedback_text)
+        trueCount = findViewById(R.id.true_count)
         gameTimerBar = findViewById(R.id.game_timer_bar)
-
 
         // ジャンルごとのクイズデータを設定
         genre = intent.getStringExtra("genre") ?: "default"
@@ -216,6 +218,7 @@ class GameActivity : AppCompatActivity() {
             true -> {
                 SoundManager.play("true")
                 showFeedback("正解！", true)
+                trueCount.text = "正答数：${quizManager.getScore()}"
                 quizManager.moveToNextQuestion(true)
                 Handler(Looper.getMainLooper()).postDelayed({ startNewQuestion() }, 800)
             }
@@ -305,8 +308,18 @@ class GameActivity : AppCompatActivity() {
      * リザルト画面へ遷移する
      */
     private fun goToResultScreen() {
+        val currentScore = quizManager.getScore()
+        val prefs = getSharedPreferences("highscores", MODE_PRIVATE)
+        val key = "highscore_$genre"
+        val best = prefs.getInt(key, 0)
+
+        // 上書き保存（スコアが更新された場合）
+        if (currentScore > best) {
+            prefs.edit().putInt(key, currentScore).apply()
+        }
+
         val intent = Intent(this, ResultActivity::class.java)
-        intent.putExtra("score", quizManager.getScore())
+        intent.putExtra("score", currentScore)
         intent.putExtra("genre", genre)
         startActivity(intent)
         finish()

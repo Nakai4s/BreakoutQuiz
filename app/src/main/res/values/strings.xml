@@ -2,7 +2,7 @@
     <string name="app_name">Breakout_Quiz</string>
 
     <!-- タイトル画面 -->
-    <string name="title">ブロ×クイ</string>
+    <string name="title">タイトル</string>
     <string name="start_label">ゲームスタート</string>
     <!-- 残基アイコン -->
     <string name="life_icon">　●●</string>

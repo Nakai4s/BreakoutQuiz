@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 
 class GenreAdapter(
     private val genres: List<String>,
+    private val scores: Map<String, Int>,
     private val onClick: (String) -> Unit
 ) : RecyclerView.Adapter<GenreAdapter.GenreViewHolder>() {
 
     inner class GenreViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val genreText: TextView = itemView.findViewById(R.id.genre_name)
+        val scoreText: TextView = itemView.findViewById(R.id.genre_score)
 
         init {
             itemView.setOnClickListener {
@@ -29,7 +31,9 @@ class GenreAdapter(
     }
 
     override fun onBindViewHolder(holder: GenreViewHolder, position: Int) {
-        holder.genreText.text = genres[position]
+        val genre = genres[position]
+        holder.genreText.text = genre
+        holder.scoreText.text = "最高正答数：${scores[genre] ?: 0}問"
     }
 
     override fun getItemCount(): Int = genres.size

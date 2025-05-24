@@ -22,11 +22,25 @@ class GenreSelectActivity : AppCompatActivity() {
         WindowInsetsUtil.applySafePadding(findViewById(R.id.rootLayout))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(this, 1)
-        recyclerView.adapter = GenreAdapter(genreList) { selectedGenre ->
+
+        // Contextが有効な状態で呼び出す
+        val scores = loadGenreScores()
+
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.adapter = GenreAdapter(genreList, scores) { selectedGenre ->
             val intent = Intent(this, GameActivity::class.java)
             intent.putExtra("genre", selectedGenre)
             startActivity(intent)
+        }
+    }
+
+    /**
+     * ジャンルごとのハイスコアを読み込む
+     */
+    private fun loadGenreScores(): Map<String, Int> {
+        val prefs = getSharedPreferences("highscores", MODE_PRIVATE)
+        return genreList.associateWith { genre ->
+            prefs.getInt("highscore_$genre", 0)
         }
     }
 }
