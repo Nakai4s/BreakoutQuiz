@@ -144,7 +144,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun startTimer() {
         gameTimer?.cancel()
-        gameTimer = object : CountDownTimer(remainingTimeMs, 1000) {
+        gameTimer = object : CountDownTimer(remainingTimeMs, 100) {
             override fun onTick(millisUntilFinished: Long) {
                 remainingTimeMs = millisUntilFinished
                 val progress = (remainingTimeMs * 100 / TOTAL_TIME_MS).toInt()

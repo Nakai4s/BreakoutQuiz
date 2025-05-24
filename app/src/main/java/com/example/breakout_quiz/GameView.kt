@@ -70,12 +70,9 @@ class GameView @JvmOverloads constructor(
     // ブロック最上段の高さ
     private var blockTopY: Float = 0f
 
-    fun getBlockTopY(): Float{
-        return blockTopY
-    }
 
     fun setQuestion(question: String, hint: String) {
-        currentQuestion = question
+        currentQuestion = "Q:$question"
         currentHint = hint
     }
 
@@ -106,15 +103,16 @@ class GameView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(backgroundColor)
 
-        if (isGameRunning) {
-            // 経過時間（デルタタイム）
-            val now = System.currentTimeMillis()
-            val deltaMillis = now - lastUpdateTime
-            lastUpdateTime = now
+        // 経過時間（デルタタイム）
+        val now = System.currentTimeMillis()
+        val deltaMillis = now - lastUpdateTime
+        lastUpdateTime = now
 
+        if (isGameRunning) {
             // ゲーム動作中のみ更新処理を行う
             if (!isCountdownActive && !isInQuizMode) updateGame(deltaMillis)
         }
+
         // 描画系は常に表示（カウントダウン中はUIが覆うので問題ない）
         drawBackgroundHint(canvas)
         drawBlocks(canvas)
@@ -246,7 +244,7 @@ class GameView @JvmOverloads constructor(
         val lines = currentHint.split("\n")
         val baseY = viewHeight * 0.15f
         // ブロックの高さを基準に計算
-        val lineSpacing = viewHeight * 0.05f//hintPaint.textSize * 1.8f
+        val lineSpacing = viewHeight * 0.05f
         lines.forEachIndexed { index, line ->
             canvas.drawText(line, x, baseY + index * lineSpacing, hintPaint)
         }
