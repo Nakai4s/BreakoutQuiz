@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)

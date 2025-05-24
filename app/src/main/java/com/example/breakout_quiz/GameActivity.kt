@@ -1,5 +1,6 @@
 package com.example.breakout_quiz
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -8,6 +9,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.breakout_quiz.utils.SoundManager
@@ -23,19 +25,21 @@ class GameActivity : AppCompatActivity() {
     private lateinit var answerButton: Button
     private lateinit var choiceLayout: LinearLayout
 
-    private lateinit var timerText: TextView
     private lateinit var lifeText: TextView
     private lateinit var feedbackText: TextView
 
     private val quizManager = QuizManager()
     private var retryCount = 2
 
+    // プログレスバー
+    private lateinit var gameTimerBar: ProgressBar
     private var remainingTimeMs = TOTAL_TIME_MS
     private var gameTimer: CountDownTimer? = null
 
+    // 選択肢関連
     private var choiceTimeoutHandler = Handler(Looper.getMainLooper())
     private var choiceTimeoutRunnable: Runnable? = null
-    private val CHOICE_TIMEOUT_MS = 5000L
+    private val choiceTimeoutMs = 5000L
 
     // クイズジャンル（リザルト画面に引き継ぐ）
     private lateinit var genre: String
@@ -47,7 +51,6 @@ class GameActivity : AppCompatActivity() {
         private const val TOTAL_TIME_MS = 15_000L // 1分
     }
 
-    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,10 +64,12 @@ class GameActivity : AppCompatActivity() {
         countdownOverlay = findViewById(R.id.countdown_overlay)
         answerButton = findViewById(R.id.answer_button)
         choiceLayout = findViewById(R.id.choice_layout)
-        timerText = findViewById(R.id.timer_text)
+
         lifeText = findViewById(R.id.life_text)
         updateLifeDisplay()
         feedbackText = findViewById(R.id.feedback_text)
+        gameTimerBar = findViewById(R.id.game_timer_bar)
+
 
         // ジャンルごとのクイズデータを設定
         genre = intent.getStringExtra("genre") ?: "default"
@@ -142,7 +147,8 @@ class GameActivity : AppCompatActivity() {
         gameTimer = object : CountDownTimer(remainingTimeMs, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 remainingTimeMs = millisUntilFinished
-                timerText.text = "残り：${millisUntilFinished / 1000}秒"
+                val progress = (remainingTimeMs * 100 / TOTAL_TIME_MS).toInt()
+                gameTimerBar.progress = progress
             }
 
             override fun onFinish() {
@@ -269,7 +275,8 @@ class GameActivity : AppCompatActivity() {
      * タイムアウトを監視する
      */
     private fun startChoiceTimeout() {
-        choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) } // 既存タイマー停止
+        // 既存タイマー停止
+        choiceTimeoutRunnable?.let { choiceTimeoutHandler.removeCallbacks(it) }
 
         choiceTimeoutRunnable = Runnable {
             SoundManager.play("false")
@@ -277,7 +284,20 @@ class GameActivity : AppCompatActivity() {
             quizManager.moveToNextQuestion(false)
             Handler(Looper.getMainLooper()).postDelayed({ exitQuizMode() }, 800)
         }
-        choiceTimeoutHandler.postDelayed(choiceTimeoutRunnable!!, CHOICE_TIMEOUT_MS)
+        choiceTimeoutHandler.postDelayed(choiceTimeoutRunnable!!, choiceTimeoutMs)
+    }
+
+
+    /**
+     * プログレスバーのアニメーションを調整する
+     * @param bar プログレスバーのオブジェクト
+     * @param to
+     * @param duration
+     */
+    fun animateProgressBar(bar: ProgressBar, to: Int, duration: Long = 1000) {
+        var animation = ObjectAnimator.ofInt(bar, "progress", bar.progress)
+        animation.duration = duration
+        bar.setProgress(bar.progress, true)
     }
 
 

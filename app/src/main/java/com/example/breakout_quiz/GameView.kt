@@ -70,6 +70,10 @@ class GameView @JvmOverloads constructor(
     // ブロック最上段の高さ
     private var blockTopY: Float = 0f
 
+    fun getBlockTopY(): Float{
+        return blockTopY
+    }
+
     fun setQuestion(question: String, hint: String) {
         currentQuestion = question
         currentHint = hint
@@ -94,7 +98,7 @@ class GameView @JvmOverloads constructor(
         viewWidth = w
         viewHeight = h
         paddle.x = w / 2f
-        paddle.y = h * 0.9f
+        paddle.y = h * 0.75f
         generateBlocks(5, 6)
         resetBall()
     }
@@ -132,7 +136,7 @@ class GameView @JvmOverloads constructor(
     fun resetBall() {
         if (viewWidth > 0 && viewHeight > 0) {
             ball.x = viewWidth / 2f
-            ball.y = viewHeight * 0.8f
+            ball.y = viewHeight * 0.6f
         }
         ball.dx = if (Math.random() < 0.5) -1f else 1f
         ball.dy = -1f

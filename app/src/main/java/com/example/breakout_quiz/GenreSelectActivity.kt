@@ -22,7 +22,7 @@ class GenreSelectActivity : AppCompatActivity() {
         WindowInsetsUtil.applySafePadding(findViewById(R.id.rootLayout))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.layoutManager = GridLayoutManager(this, 1)
         recyclerView.adapter = GenreAdapter(genreList) { selectedGenre ->
             val intent = Intent(this, GameActivity::class.java)
             intent.putExtra("genre", selectedGenre)

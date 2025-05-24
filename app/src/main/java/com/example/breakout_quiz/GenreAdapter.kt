@@ -16,7 +16,8 @@ class GenreAdapter(
 
         init {
             itemView.setOnClickListener {
-                onClick(genres[adapterPosition])
+                //onClick(genres[adapterPosition])
+                onClick(genres[absoluteAdapterPosition])
             }
         }
     }
