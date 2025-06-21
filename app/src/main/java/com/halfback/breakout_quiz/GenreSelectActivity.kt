@@ -13,7 +13,7 @@ import com.halfback.breakout_quiz.utils.WindowInsetsUtil
 class GenreSelectActivity : AppCompatActivity() {
 
     // jsonファイル名と同じにする
-    private val genreList = listOf("スポーツ", "歴史")
+    private val genreList = listOf("スポーツ", "歴史","国語", "理科","社会","芸能","アニメ・漫画","一般常識")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +26,7 @@ class GenreSelectActivity : AppCompatActivity() {
         // Contextが有効な状態で呼び出す
         val scores = loadGenreScores()
 
+        // 2列で表示する
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = GenreAdapter(genreList, scores) { selectedGenre ->
             val intent = Intent(this, GameActivity::class.java)

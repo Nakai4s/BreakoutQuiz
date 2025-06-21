@@ -18,7 +18,6 @@ class GenreAdapter(
 
         init {
             itemView.setOnClickListener {
-                //onClick(genres[adapterPosition])
                 onClick(genres[absoluteAdapterPosition])
             }
         }
@@ -33,6 +32,7 @@ class GenreAdapter(
     override fun onBindViewHolder(holder: GenreViewHolder, position: Int) {
         val genre = genres[position]
         holder.genreText.text = genre
+        holder.genreText.textSize = 20f
         holder.scoreText.text = "最高正答数：${scores[genre] ?: 0}問"
     }
 

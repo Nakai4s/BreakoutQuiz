@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.view.ContentInfoCompat.Flags
 import com.halfback.breakout_quiz.utils.SoundManager
 
 /**
@@ -32,7 +33,7 @@ class GameView @JvmOverloads constructor(
     private val ballPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.YELLOW }
     private val blockPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.CYAN
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
     }
     private val questionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
@@ -222,15 +223,41 @@ class GameView @JvmOverloads constructor(
         canvas.drawText(currentQuestion, x, y, questionPaint)
     }
 
+    /**
+     * ブロック裏のヒントを描画する。
+     */
     private fun drawBackgroundHint(canvas: Canvas) {
         val x = viewWidth * 0.05f
         val lines = currentHint.split("\n")
         val baseY = viewHeight * 0.15f
         // ブロックの高さを基準に計算
-        val lineSpacing = viewHeight * 0.05f
+        val padding = 8f
+        val lineSpacing = viewHeight * 0.05f + padding
+
+        // ヒントごとにサイズ
         lines.forEachIndexed { index, line ->
+            hintPaint.textSize = getAdjustedTextSize(line, hintPaint)
             canvas.drawText(line, x, baseY + index * lineSpacing, hintPaint)
         }
+    }
+
+    /**
+     * 調整後のテキストサイズを返却する。
+     * drawBackgroundHintからの呼び出しを想定。
+     * @param text 分割後のヒント
+     * @param paint hintPaint
+     */
+    private fun getAdjustedTextSize(text:String, paint: Paint): Float {
+        // テキストサイズは基本36
+        var textSize = 36f
+        val maxWidth = viewWidth * 0.95f
+        val minSize = 24f
+        // 画面幅をはみ出さないよう、最小24まで1サイズずつ縮小
+        while(paint.measureText(text) > maxWidth && textSize > minSize) {
+            textSize -= 1f
+            paint.textSize = textSize
+        }
+        return textSize
     }
 
     /**
