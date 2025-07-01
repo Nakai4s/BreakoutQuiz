@@ -32,6 +32,7 @@ class GameActivity : AppCompatActivity() {
 
     private val quizManager = QuizManager()
     private var retryCount = 2
+    private var falseCount = 2
 
     // プログレスバー
     private lateinit var gameTimerBar: ProgressBar

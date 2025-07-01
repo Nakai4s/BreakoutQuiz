@@ -13,7 +13,10 @@ import com.halfback.breakout_quiz.utils.WindowInsetsUtil
 class GenreSelectActivity : AppCompatActivity() {
 
     // jsonファイル名と同じにする
-    private val genreList = listOf("スポーツ", "歴史","国語", "理科","社会","芸能","アニメ・漫画","一般常識")
+    private val genreList = listOf(
+        "1"
+        //"スポーツ", "歴史","国語", "理科","社会","芸能","アニメ・漫画","一般常識"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
