@@ -13,3 +13,6 @@ app/src/main/assets/*.json
 
 # wav files
 app/src/main/res/raw/*.wav
+
+# Google API Key
+app/google-services.json
